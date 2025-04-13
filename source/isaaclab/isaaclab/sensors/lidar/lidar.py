@@ -103,6 +103,32 @@ class Lidar(SensorBase):
         # self._check_supported_data_types(cfg)
         # initialize base class
         super().__init__(cfg)
+
+        # toggle rendering of rtx sensors as True
+        # this flag is read by SimulationContext to determine if rtx sensors should be rendered
+        carb_settings_iface = carb.settings.get_settings()
+        carb_settings_iface.set_bool("/isaaclab/render/rtx_sensors", True)
+
+        #spawn the asset
+        # pos = torch.tensor(self.cfg.offset.pos, dtype=torch.float32, device="cpu").unsqueeze(0)
+        # rot = torch.tensor(self.cfg.offset.rot, dtype=torch.float32, device="cpu").unsqueeze(0)
+        # rot_offset = convert_camera_frame_orientation_convention(
+        #         rot, origin=self.cfg.offset.convention, target="opengl"
+        #     )
+
+         # spawn the asset
+        print(f"Calling lidar init")
+        if self.cfg.spawn is not None:
+            # compute the rotation offset
+            rot = torch.tensor(self.cfg.offset.rot, dtype=torch.float32, device="cpu").unsqueeze(0)
+            rot_offset = convert_camera_frame_orientation_convention(
+                rot, origin=self.cfg.offset.convention, target="opengl"
+            )
+            rot_offset = rot_offset.squeeze(0).numpy()
+            # spawn the asset
+            self.cfg.spawn.func(
+                self.cfg.prim_path, self.cfg.spawn, translation=self.cfg.offset.pos, orientation=rot_offset
+            )
         
         # Create empty variables for storing output data
         self._data = LidarData()
@@ -262,8 +288,10 @@ class Lidar(SensorBase):
         # resolve env_ids
         if env_ids is None:
             env_ids = self._ALL_INDICES
+        # get up axis of current stage
+        up_axis = stage_utils.get_stage_up_axis()
         # set camera poses using the view
-        orientations = quat_from_matrix(create_rotation_matrix_from_view(eyes, targets, device=self._device))
+        orientations = quat_from_matrix(create_rotation_matrix_from_view(eyes, targets, up_axis, device=self._device))
         self._view.set_world_poses(eyes, orientations, env_ids)
 
     """
@@ -296,18 +324,20 @@ class Lidar(SensorBase):
         Raises:
             RuntimeError: If the number of LiDAR prims in the view does not match the expected number.
         """
+        carb_settings_iface = carb.settings.get_settings()
+        if not carb_settings_iface.get("/isaaclab/cameras_enabled"):
+            raise RuntimeError(
+                "A camera was spawned without the --enable_cameras flag. Please use --enable_cameras to enable"
+                " rendering."
+            )
+        
         import omni.replicator.core as rep
 
         # Initialize the base class
         super()._initialize_impl()
 
         # Prepare a view for the LiDAR sensor based on its path
-        pos = torch.tensor(self.cfg.offset.pos, dtype=torch.float32, device="cpu").unsqueeze(0)
-        rot = torch.tensor(self.cfg.offset.rot, dtype=torch.float32, device="cpu").unsqueeze(0)
-        rot_offset = convert_camera_frame_orientation_convention(
-                rot, origin=self.cfg.offset.convention, target="opengl"
-            )
-        self._view = XFormPrim(self.cfg.prim_path, translations=pos, reset_xform_properties=False)
+        self._view = XFormPrim(self.cfg.prim_path, reset_xform_properties=False)
         self._view.initialize()
 
         # Ensure the number of detected LiDAR prims matches the expected number

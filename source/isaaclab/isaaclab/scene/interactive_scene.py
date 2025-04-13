@@ -637,6 +637,7 @@ class InteractiveScene:
             # note: easier than writing a list of keywords: [num_envs, env_spacing, lazy_sensor_update]
             if asset_name in InteractiveSceneCfg.__dataclass_fields__ or asset_cfg is None:
                 continue
+            print(f"Interactive Scene adding asset to category: {asset_name}")
             # resolve regex
             if hasattr(asset_cfg, "prim_path"):
                 asset_cfg.prim_path = asset_cfg.prim_path.format(ENV_REGEX_NS=self.env_regex_ns)

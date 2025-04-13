@@ -690,16 +690,20 @@ def find_matching_prims(prim_path_regex: str, stage: Usd.Stage | None = None) ->
     tokens = prim_path_regex.split("/")[1:]
     tokens = [f"^{token}$" for token in tokens]
     # iterate over all prims in stage (breath-first search)
+    # print(f"Prim path tokens: {tokens}")
     all_prims = [stage.GetPseudoRoot()]
     output_prims = []
     for index, token in enumerate(tokens):
+        # print(f"For token: {token}")
         token_compiled = re.compile(token)
+        # print(f"Compiled token: {token_compiled}")
         for prim in all_prims:
             for child in prim.GetAllChildren():
                 if token_compiled.match(child.GetName()) is not None:
                     output_prims.append(child)
         if index < len(tokens) - 1:
             all_prims = output_prims
+            # print(f"Found prims: {all_prims}")
             output_prims = []
     return output_prims
 

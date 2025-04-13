@@ -325,6 +325,9 @@ class RigidObjectCollection(AssetBase):
             object_ids = self._ALL_OBJ_INDICES
         # note: we need to do this here since tensors are not set into simulation until step.
         # set into internal buffers
+        # print(f"env_ids: {env_ids} object_ids: {object_ids}")
+        # print("self._data.object_link_state_w[:, object_ids, :7] shape", self._data.object_link_state_w[:, object_ids, :7].shape)
+        # print("object_pose.clone() shape", object_pose.clone().shape)
         self._data.object_link_state_w[env_ids[:, None], object_ids, :7] = object_pose.clone()
         self._data.object_state_w[env_ids[:, None], object_ids, :7] = object_pose.clone()
         # convert the quaternion from wxyz to xyzw

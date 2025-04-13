@@ -140,3 +140,68 @@ def spawn_camera(
         prim.GetAttribute(prim_prop_name).Set(param_value)
     # return the prim
     return prim_utils.get_prim_at_path(prim_path)
+
+@clone
+def spawn_lidar(
+    prim_path: str,
+    cfg: sensors_cfg.LidarSpawnCfg,
+    translation: tuple[float, float, float] | None = None,
+    orientation: tuple[float, float, float, float] | None = None,
+) -> Usd.Prim:
+    """Create a USD camera prim with given projection type.
+
+    The function creates various attributes on the camera prim that specify the camera's properties.
+    These are later used by ``omni.replicator.core`` to render the scene with the given camera.
+
+    .. note::
+        This function is decorated with :func:`clone` that resolves prim path into list of paths
+        if the input prim path is a regex pattern. This is done to support spawning multiple assets
+        from a single and cloning the USD prim at the given path expression.
+
+    Args:
+        prim_path: The prim path or pattern to spawn the asset at. If the prim path is a regex pattern,
+            then the asset is spawned at all the matching prim paths.
+        cfg: The configuration instance.
+        translation: The translation to apply to the prim w.r.t. its parent prim. Defaults to None, in which case
+            this is set to the origin.
+        orientation: The orientation in (w, x, y, z) to apply to the prim w.r.t. its parent prim. Defaults to None,
+            in which case this is set to identity.
+
+    Returns:
+        The created prim.
+
+    Raises:
+        ValueError: If a prim already exists at the given path.
+    """
+    # spawn camera if it doesn't exist.
+    if not prim_utils.is_prim_path_valid(prim_path):
+        prim_utils.create_prim(prim_path, "lidar", translation=translation, orientation=orientation)
+    else:
+        raise ValueError(f"A prim already exists at path: '{prim_path}'.")
+
+    
+    # get camera prim
+    # prim = prim_utils.get_prim_at_path(prim_path)
+    # create attributes for the fisheye camera model
+    # note: for pinhole those are already part of the USD camera prim
+    # for attr_name, attr_type in attribute_types.values():
+    #     # check if attribute does not exist
+    #     if prim.GetAttribute(attr_name).Get() is None:
+    #         # create attribute based on type
+    #         prim.CreateAttribute(attr_name, attr_type)
+    # set attribute values
+    # for param_name, param_value in cfg.__dict__.items():
+    #     # check if value is valid
+    #     if param_value is None or param_name in non_usd_cfg_param_names:
+    #         continue
+    #     # obtain prim property name
+    #     if param_name in attribute_types:
+    #         # check custom attributes
+    #         prim_prop_name = attribute_types[param_name][0]
+    #     else:
+    #         # convert attribute name in prim to cfg name
+    #         prim_prop_name = to_camel_case(param_name, to="cC")
+    #     # get attribute from the class
+    #     prim.GetAttribute(prim_prop_name).Set(param_value)
+    # return the prim
+    return prim_utils.get_prim_at_path(prim_path)

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import math
 import torch
+import numpy as np
 from typing import TYPE_CHECKING, Literal
 
 import carb
@@ -27,13 +28,57 @@ from pxr import Gf, Sdf, UsdGeom, Vt
 import isaaclab.sim as sim_utils
 import isaaclab.utils.math as math_utils
 from isaaclab.actuators import ImplicitActuator
-from isaaclab.assets import Articulation, DeformableObject, RigidObject
+from isaaclab.assets import Articulation, DeformableObject, RigidObject, RigidObjectCollection
 from isaaclab.managers import EventTermCfg, ManagerTermBase, SceneEntityCfg
 from isaaclab.terrains import TerrainImporter
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedEnv
 
+def randomize_cube_pos(
+    env: ManagerBasedEnv,
+    env_ids: torch.Tensor | None,
+    asset_cfg: SceneEntityCfg,
+):
+
+    # resolve environment ids
+    if env_ids is None:
+        env_ids = torch.arange(env.scene.num_envs, device=env.device)
+    
+    
+    
+     # object collection
+    rigid_object_collection: RigidObjectCollection = env.scene[asset_cfg.name]
+    object_ids = torch.arange(rigid_object_collection.num_objects, dtype=torch.long, device=env.device)
+    object_state = rigid_object_collection.data.default_object_state.clone()
+    print(f"[INFO]: Object state: {object_state.shape}")
+    print(f"[INFO]: env_ids input: {env_ids} shape {env_ids.shape}")
+    print(f"[INFO]: Scene origins: {env.scene.env_origins}")
+    randomized_pos = randomized_box_pos(env).unsqueeze(0).expand(len(env_ids), -1, -1).clone()
+    origins = env.scene.env_origins[env_ids[:, None], :]
+    print(f"[INFO]: randomized_pos: {randomized_pos.shape} origins: {origins.shape}")
+    randomized_pos += origins
+    object_state[env_ids[:, None], object_ids, :3] = randomized_pos
+    rigid_object_collection.write_object_link_pose_to_sim(object_state[env_ids[:, None], object_ids, :7], env_ids=env_ids)
+    rigid_object_collection.write_object_com_velocity_to_sim(object_state[env_ids[:, None], object_ids, 7:], env_ids=env_ids)
+
+def randomized_box_pos(env: ManagerBasedEnv) -> torch.Tensor:
+    boxes_pos = [
+                    [[-8, 32, 4], [0.0, 32, 4], [8, 32, 4], [-8, 24, 4], [0.0, 24, 4], [8, 24, 4], [-8, 16, 4], [0.0, 16, 4], [8, 16, 4],],
+                    [[16, 32, 4], [24, 32, 4], [32, 32, 4], [16, 24, 4], [24, 24, 4], [32, 24, 4], [16, 16, 4], [24, 16, 4], [32, 16, 4],],
+                    [[-32, 8, 4], [-24, 8, 4], [-16, 8, 4], [-32, 0.0, 4], [-24, 0.0, 4], [-16, 0.0, 4], [-32, -8, 4], [-24, -8, 4], [-16, -8, 4]],
+                    [[-8, 8, 4], [0.0, 8, 4], [8, 8, 4], [-8, 0.0, 4], [0.0, 0.0, 4], [8, 0.0, 4], [-8, -8, 4], [0.0, -8, 4], [8, -8, 4],],
+                    [[32, 8, 4], [24, 8, 4], [16, 8, 4], [32, 0.0, 4], [24, 0.0, 4], [16, 0.0, 4], [32, -8, 4], [24, -8, 4], [16, -8, 4],],
+                    [[-32, -16, 4], [-24, -16, 4], [-16, -16, 4], [-32, -24, 4], [-24, -24, 4], [-16, -24, 4], [-32, -32, 4], [-24, -32, 4], [-16, -32, 4],],
+                    [[-8, -16, 4], [0.0, -16, 4], [8, -16, 4], [-8, -24, 4], [0.0, -24, 4], [8, -24, 4], [-8, -32, 4], [0.0, -32, 4], [8, -32, 4],],
+                ]
+
+    box_pos_tensor = []
+    for i in range(14):
+        index = np.random.randint(9)
+        box_pos_tensor.append(boxes_pos[int(i/2)][index])
+
+    return torch.tensor(box_pos_tensor, device=env.device)
 
 def randomize_rigid_body_scale(
     env: ManagerBasedEnv,

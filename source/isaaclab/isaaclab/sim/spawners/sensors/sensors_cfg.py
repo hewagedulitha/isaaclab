@@ -233,3 +233,20 @@ class FisheyeCameraCfg(PinholeCameraCfg):
 
     fisheye_polynomial_f: float = 0.0
     """Sixth component of fisheye polynomial. Defaults to 0.0."""
+
+@configclass
+class LidarSpawnCfg(SpawnerCfg):
+    """Configuration parameters for a USD camera prim with lidar camera settings.
+
+    For more information on the parameters, please refer to the `camera documentation <https://docs.omniverse.nvidia.com/materials-and-rendering/latest/cameras.html>`__.
+
+    ..note ::
+        Focal length as well as the aperture sizes and offsets are set as a tenth of the world unit. In our case, the
+        world unit is Meter s.t. all of these values are set in cm.
+
+    .. note::
+        The default values are taken from the `Replicator camera <https://docs.omniverse.nvidia.com/py/replicator/1.9.8/source/omni.replicator.core/docs/API.html#omni.replicator.core.create.camera>`__
+        function.
+    """
+
+    func: Callable = sensors.spawn_lidar

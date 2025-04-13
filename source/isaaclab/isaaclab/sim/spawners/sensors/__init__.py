@@ -12,4 +12,4 @@ Currently, the following sensors are supported:
 """
 
 from .sensors import spawn_camera
-from .sensors_cfg import FisheyeCameraCfg, PinholeCameraCfg
+from .sensors_cfg import FisheyeCameraCfg, PinholeCameraCfg, LidarSpawnCfg

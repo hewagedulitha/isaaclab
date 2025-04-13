@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import MISSING
 from typing import Literal
 
+from isaaclab.sim import LidarSpawnCfg
 from isaaclab.utils import configclass
 
 from ..sensor_base_cfg import SensorBaseCfg
@@ -45,6 +46,12 @@ class LidarCfg(SensorBaseCfg):
     Note:
         The parent frame is the frame the sensor attaches to. For example, the parent frame of a
         camera at path ``/World/envs/env_0/Robot/Camera`` is ``/World/envs/env_0/Robot``.
+    """
+    spawn: LidarSpawnCfg | None = MISSING
+    """Spawn configuration for the asset.
+
+    If None, then the prim is not spawned by the asset. Instead, it is assumed that the
+    asset is already present in the scene.
     """
 
     horizontal_fov: float = 360.0
