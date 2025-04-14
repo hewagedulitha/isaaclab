@@ -46,7 +46,7 @@ class OutbackNavEnv(DirectRLEnv):
 
         wheel_radius = 0.24
         wheel_base = 0.54
-        self._controller: DifferentialController = DifferentialController("test_controller", wheel_radius, wheel_base)
+        self._controller: DifferentialController = DifferentialController("test_controller", wheel_radius, wheel_base, max_angular_speed=1.0)
 
 
     def _setup_scene(self):
@@ -71,6 +71,14 @@ class OutbackNavEnv(DirectRLEnv):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self.cfg.action_scale: {self.cfg.action_scale}")
         self._processed_actions = self.cfg.action_scale * self._actions
+        linear_speed = 1.0
+        # print(f"[INFO]:_processed_actions Shape: {self._processed_actions.shape} self.num_envs: {self.num_envs}")
+        out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
+        joint_vel_targets = torch.stack([self.get_joint_vel_targets(i) for i in out ])
+        joint_vel = self._robot.data.default_joint_vel.clone()
+        joint_vel[...,:2] = joint_vel_targets
+        # print(f"Controller max_angular_speed:{self._controller.max_angular_speed} actions: {out} joint_vel_targets: {joint_vel_targets} #####################")
+        self._robot.set_joint_velocity_target(joint_vel)
     
     def get_joint_vel_targets(self, command: torch.Tensor) -> torch.Tensor:
         command_np = command.clone().detach().cpu().numpy()
@@ -81,12 +89,12 @@ class OutbackNavEnv(DirectRLEnv):
     def _apply_action(self):
         linear_speed = 1.0
         # print(f"[INFO]:_processed_actions Shape: {self._processed_actions.shape} self.num_envs: {self.num_envs}")
-        out = torch.cat([self._processed_actions, linear_speed * torch.ones((self.num_envs, 1), device=self.device)], 1)
-        joint_vel_targets = torch.stack([self.get_joint_vel_targets(i) for i in out ])
-        joint_vel = self._robot.data.default_joint_vel.clone()
-        joint_vel[...,:2] = joint_vel_targets
-        # print(f"ROBOT JOINT NAMES:{self._robot.data.joint_names} JOINT VEL: {joint_vel.shape} joint_vel_targets: {joint_vel_targets.shape} #####################")
-        self._robot.set_joint_velocity_target(joint_vel)
+        # out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
+        # joint_vel_targets = torch.stack([self.get_joint_vel_targets(i) for i in out ])
+        # joint_vel = self._robot.data.default_joint_vel.clone()
+        # joint_vel[...,:2] = joint_vel_targets
+        # print(f"Controller max_angular_speed:{self._controller.max_angular_speed} actions: {out} joint_vel_targets: {joint_vel_targets} #####################")
+        # self._robot.set_joint_velocity_target(joint_vel)
 
     def _get_observations(self) -> dict:
         self._previous_actions = self._actions.clone()
@@ -117,10 +125,11 @@ class OutbackNavEnv(DirectRLEnv):
 
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # print(f"[INFO]: body_pose Shape: {body_pose.shape} RTX Lidar Output:{body_pose}")
-        goal = [24.0, -24.0]
+
+        goals = self.scene.env_origins.clone() + torch.tensor([24.0, -24.0, 0.0])
 
         # distance error
-        distance_to_the_goal = torch.sqrt((body_pose[:, 0]-goal[0])**2 + (body_pose[:, 1]-goal[1])**2)
+        distance_to_the_goal = torch.sqrt((body_pose[:, 0]-goals[:, 0])**2 + (body_pose[:, 1]-goals[:, 1])**2)
         distance_to_the_goal_error = torch.maximum(1 - distance_to_the_goal/67.22, torch.zeros(self.num_envs, dtype=torch.float, device=self.device))
 
         #clash error

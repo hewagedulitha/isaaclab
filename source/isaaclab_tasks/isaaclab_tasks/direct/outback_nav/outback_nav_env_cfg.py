@@ -398,8 +398,8 @@ class MultiObjectSceneCfg(InteractiveSceneCfg):
             rot=(1.0, 0.0, 0.0, 0.0),  # Example rotation offset; no rotation in this case
             convention="ros"  # Frame convention
         ),
-        draw_lines=True,
-        draw_points=True,
+        draw_lines=False,
+        draw_points=False,
     )
     
     # contact sensors
@@ -457,8 +457,8 @@ class MultiObjectSceneCfg(InteractiveSceneCfg):
 @configclass
 class OutbackNavEnvCfg(DirectRLEnvCfg):
     # env
-    episode_length_s = 20.0
-    decimation = 1
+    episode_length_s = 100.0
+    decimation = 20
     action_scale = 2.0
     action_space = 1
     observation_space = [480, 640, 3]
@@ -466,7 +466,7 @@ class OutbackNavEnvCfg(DirectRLEnvCfg):
 
     # simulation
     sim: SimulationCfg = SimulationCfg(
-        dt=1 / 200,
+        dt=1 / 500,
         render_interval=decimation,
         physics_material=sim_utils.RigidBodyMaterialCfg(
             friction_combine_mode="multiply",
