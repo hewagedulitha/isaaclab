@@ -126,7 +126,7 @@ class OutbackNavEnv(DirectRLEnv):
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # print(f"[INFO]: body_pose Shape: {body_pose.shape} RTX Lidar Output:{body_pose}")
 
-        goals = self.scene.env_origins.clone() + torch.tensor([24.0, -24.0, 0.0])
+        goals = self.scene.env_origins.clone() + torch.tensor([24.0, -24.0, 0.0], dtype=torch.float, device=self.device)
 
         # distance error
         distance_to_the_goal = torch.sqrt((body_pose[:, 0]-goals[:, 0])**2 + (body_pose[:, 1]-goals[:, 1])**2)

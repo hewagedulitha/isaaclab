@@ -56,7 +56,8 @@ def randomize_cube_pos(
     # print(f"[INFO]: Scene origins: {env.scene.env_origins}")
     randomized_pos = randomized_box_pos(env).unsqueeze(0).expand(len(env_ids), -1, -1).clone() # shape [len(env_ids), num_cubes, 3]
     origins = env.scene.env_origins[env_ids[:, None], :] # shape [len(env_ids), 1, 3]
-    # print(f"[INFO]: randomized_pos: {randomized_pos.shape} origins: {origins.shape}")
+    # print(f"[INFO]: randomized_pos shape: {randomized_pos.shape} origins shape: {origins.shape}")
+    # print(f"[INFO]: randomized_pos: {randomized_pos.dtype} origins: {origins.dtype}")
     randomized_pos += origins
     object_state[env_ids[:, None], object_ids, :3] = randomized_pos
     rigid_object_collection.write_object_link_pose_to_sim(object_state[env_ids[:, None], object_ids, :7], env_ids=env_ids)
@@ -78,7 +79,8 @@ def randomized_box_pos(env: ManagerBasedEnv) -> torch.Tensor:
         index = np.random.randint(9)
         box_pos_tensor.append(boxes_pos[int(i/2)][index])
 
-    return torch.tensor(box_pos_tensor, device=env.device) #shape [num_cubes, 3]
+    #using float32 because env_origins of the scene will use float32
+    return torch.tensor(box_pos_tensor, dtype=torch.float32, device=env.device) #shape [num_cubes, 3]
 
 def randomize_rigid_body_scale(
     env: ManagerBasedEnv,

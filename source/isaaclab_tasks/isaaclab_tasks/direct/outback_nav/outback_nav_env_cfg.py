@@ -3,7 +3,8 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import torch
+import gymnasium as gym
+import numpy as np
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
@@ -74,6 +75,7 @@ class MultiObjectSceneCfg(InteractiveSceneCfg):
         prim_path="{ENV_REGEX_NS}/carter_v1",
         spawn=sim_utils.UsdFileCfg(
             usd_path=f"{ISAAC_NUCLEUS_DIR}/Robots/Carter/carter_v1.usd",
+            scale=(2.0, 2.0, 2.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 rigid_body_enabled=True,
                 max_linear_velocity=1000.0,
@@ -460,7 +462,8 @@ class OutbackNavEnvCfg(DirectRLEnvCfg):
     episode_length_s = 100.0
     decimation = 20
     action_scale = 2.0
-    action_space = 1
+    #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
+    action_space = gym.spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
     observation_space = [480, 640, 3]
     state_space = 0
 
