@@ -44,8 +44,8 @@ class OutbackNavEnv(DirectRLEnv):
             ]
         }
 
-        wheel_radius = 0.24
-        wheel_base = 0.54
+        wheel_radius = 0.48
+        wheel_base = 1.08
         self._controller: DifferentialController = DifferentialController("test_controller", wheel_radius, wheel_base, max_angular_speed=1.0)
 
 
@@ -70,9 +70,9 @@ class OutbackNavEnv(DirectRLEnv):
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self.cfg.action_scale: {self.cfg.action_scale}")
-        self._processed_actions = self.cfg.action_scale * self._actions
+        self._processed_actions = self._actions
         linear_speed = 1.0
-        # print(f"[INFO]:_processed_actions Shape: {self._processed_actions.shape} self.num_envs: {self.num_envs}")
+        # print(f"[INFO]:_processed_actions: {self._processed_actions}")
         out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
         joint_vel_targets = torch.stack([self.get_joint_vel_targets(i) for i in out ])
         joint_vel = self._robot.data.default_joint_vel.clone()
@@ -172,26 +172,28 @@ class OutbackNavEnv(DirectRLEnv):
         max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         # print(f"[INFO]: force_matrices_L: {force_matrices_L.shape} force_matrices_R:{force_matrices_R.shape} force_matrices:{force_matrices.shape} flat_force_matrices:{flat_force_matrices.shape} max_force: {max_force.shape}")
         died = torch.any(max_force > 1.0, dim=1)
-        # print(f"[INFO]: _get_dones died: {died.shape} time_out:{time_out.shape}")
+        # print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
         return died, time_out
 
     def _reset_idx(self, env_ids: torch.Tensor | None):
+        # print("[INFO] Resetting ")
         if env_ids is None or len(env_ids) == self.num_envs:
             env_ids = self._robot._ALL_INDICES
         self._robot.reset(env_ids)
         super()._reset_idx(env_ids)
         if len(env_ids) == self.num_envs:
             # Spread out the resets to avoid spikes in training when many environments reset at a similar time
+            # print("[INFO] Resetting all indices")
             self.episode_length_buf[:] = torch.randint_like(self.episode_length_buf, high=int(self.max_episode_length))
         self._actions[env_ids] = 0.0
         self._previous_actions[env_ids] = 0.0
         # Reset robot state
         root_state = self._robot.data.default_root_state.clone()
-        root_state[:, :3] += self.scene.env_origins
+        root_state[env_ids, :3] += self.scene.env_origins[env_ids, :]
         joint_pos, joint_vel = self._robot.data.default_joint_pos.clone(), self._robot.data.default_joint_vel.clone()
-        self._robot.write_root_pose_to_sim(root_state[:, :7])
-        self._robot.write_root_velocity_to_sim(root_state[:, 7:])
-        self._robot.write_joint_state_to_sim(joint_pos, joint_vel)
+        self._robot.write_root_pose_to_sim(root_state[env_ids, :7], env_ids= env_ids)
+        self._robot.write_root_velocity_to_sim(root_state[env_ids, 7:], env_ids= env_ids)
+        self._robot.write_joint_state_to_sim(joint_pos[env_ids, :], joint_vel[env_ids, :], env_ids= env_ids)
         
 
         # Logging

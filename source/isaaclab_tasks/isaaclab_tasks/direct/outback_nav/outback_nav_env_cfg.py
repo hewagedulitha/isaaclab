@@ -460,7 +460,7 @@ class MultiObjectSceneCfg(InteractiveSceneCfg):
 class OutbackNavEnvCfg(DirectRLEnvCfg):
     # env
     episode_length_s = 100.0
-    decimation = 20
+    decimation = 100
     action_scale = 2.0
     #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
     action_space = gym.spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
