@@ -369,16 +369,29 @@ class MultiObjectSceneCfg(InteractiveSceneCfg):
     )
 
     # Camera
-    camera = CameraCfg(
+    # camera = CameraCfg(
+    #     prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link/front_cam",
+    #     update_period=0.1,
+    #     height=100,
+    #     width=100,
+    #     data_types=["rgb"],
+    #     spawn=sim_utils.PinholeCameraCfg(
+    #         focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
+    #     ),
+    #     offset=CameraCfg.OffsetCfg(pos=(0.510, 0.0, 0.015), rot=(0.5, -0.5, 0.5, -0.5), convention="ros"),
+    # )
+
+    #Tiled Camera
+    camera = TiledCameraCfg(
         prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link/front_cam",
-        update_period=0.1,
-        height=480,
-        width=640,
-        data_types=["rgb", "distance_to_image_plane"],
+        # update_period=0.1,
+        height=80,
+        width=80,
+        data_types=["rgb"],
         spawn=sim_utils.PinholeCameraCfg(
             focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
         ),
-        offset=CameraCfg.OffsetCfg(pos=(0.510, 0.0, 0.015), rot=(0.5, -0.5, 0.5, -0.5), convention="ros"),
+        offset=TiledCameraCfg.OffsetCfg(pos=(0.510, 0.0, 0.015), rot=(0.5, -0.5, 0.5, -0.5), convention="ros"),
     )
 
     #LIDAR - name is important. Otherwise, the sensor will get initialized before the robot, resulting in an error.
@@ -458,13 +471,27 @@ class MultiObjectSceneCfg(InteractiveSceneCfg):
 
 @configclass
 class OutbackNavEnvCfg(DirectRLEnvCfg):
+    # scene
+    scene: MultiObjectSceneCfg = MultiObjectSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
+
+    # events
+    events: EventCfg = EventCfg()
+
+    # robot
+    # robot: ArticulationCfg = ANYMAL_C_CFG.replace(prim_path="/World/envs/env_.*/Robot")
+    # contact_sensor: ContactSensorCfg = ContactSensorCfg(
+    #     prim_path="/World/envs/env_.*/Robot/.*", history_length=3, update_period=0.005, track_air_time=True
+    # )
+
     # env
-    episode_length_s = 100.0
+    episode_length_s = 20.0
     decimation = 100
     action_scale = 2.0
     #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
     action_space = gym.spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
-    observation_space = [480, 640, 3]
+    observation_space = gym.spaces.Box(
+        low=float("-inf"), high=float("inf"), shape=(scene.camera.height, scene.camera.width, 3)
+    )  # or for simplicity: [height, width, 3]
     state_space = 0
 
     # simulation
@@ -479,18 +506,6 @@ class OutbackNavEnvCfg(DirectRLEnvCfg):
             restitution=0.0,
         ),
     )
-
-    # scene
-    scene: MultiObjectSceneCfg = MultiObjectSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
-
-    # events
-    events: EventCfg = EventCfg()
-
-    # robot
-    # robot: ArticulationCfg = ANYMAL_C_CFG.replace(prim_path="/World/envs/env_.*/Robot")
-    # contact_sensor: ContactSensorCfg = ContactSensorCfg(
-    #     prim_path="/World/envs/env_.*/Robot/.*", history_length=3, update_period=0.005, track_air_time=True
-    # )
 
     # reward scales
     goal_reward_scale = 20.0

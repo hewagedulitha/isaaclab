@@ -9,6 +9,7 @@ import gymnasium as gym
 import torch
 import math
 import numpy as np
+import wandb
 
 import isaaclab.sim as sim_utils
 from isaaclab.assets import (
@@ -47,6 +48,21 @@ class OutbackNavEnv(DirectRLEnv):
         wheel_radius = 0.48
         wheel_base = 1.08
         self._controller: DifferentialController = DifferentialController("test_controller", wheel_radius, wheel_base, max_angular_speed=1.0)
+
+        # self._run = wandb.init(
+        #     # Set the wandb entity where your project will be logged (generally your team name).
+        #     entity="hewaged-edith-cowan-university",
+        #     # Set the wandb project where this run will be logged.
+        #     project="outback-nav-ppo",
+        #     # Track hyperparameters and run metadata.
+        #     config={
+        #         "max_episode_length (seconds)": self.max_episode_length_s,
+        #         "algo": "PPO",
+        #         "sim_dt": self.cfg.sim.dt,
+        #         "decimation": self.cfg.decimation,
+        #         "num_envs": self.num_envs,
+        #     },
+        # )
 
 
     def _setup_scene(self):
@@ -208,3 +224,9 @@ class OutbackNavEnv(DirectRLEnv):
         extras["Episode_Termination/base_contact"] = torch.count_nonzero(self.reset_terminated[env_ids]).item()
         extras["Episode_Termination/time_out"] = torch.count_nonzero(self.reset_time_outs[env_ids]).item()
         self.extras["log"].update(extras)
+        self._run.log(self.extras["log"])
+    
+    def close(self):
+        self._run.finish()
+        super().close()
+        

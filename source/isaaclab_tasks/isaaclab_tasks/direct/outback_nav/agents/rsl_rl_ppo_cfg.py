@@ -10,7 +10,7 @@ from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, R
 
 @configclass
 class AnymalCFlatPPORunnerCfg(RslRlOnPolicyRunnerCfg):
-    num_steps_per_env = 120
+    num_steps_per_env = 40
     max_iterations = 10000
     save_interval = 50
     experiment_name = "anymal_c_flat_direct"

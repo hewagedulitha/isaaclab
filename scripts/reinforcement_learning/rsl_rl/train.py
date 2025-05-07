@@ -63,6 +63,7 @@ simulation_app = app_launcher.app
 """Rest everything follows."""
 
 import gymnasium as gym
+import wandb
 import os
 import torch
 from datetime import datetime
@@ -70,6 +71,7 @@ from datetime import datetime
 from rsl_rl.runners import OnPolicyRunner
 
 from isaaclab.envs import (
+    DirectRLEnv,
     DirectMARLEnv,
     DirectMARLEnvCfg,
     DirectRLEnvCfg,
@@ -132,6 +134,25 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+
+    if isinstance(env.unwrapped, DirectRLEnv):
+        direct_env: DirectRLEnv = env.unwrapped
+        wandb_run = wandb.init(
+                # Set the wandb entity where your project will be logged (generally your team name).
+                entity="hewaged-edith-cowan-university",
+                # Set the wandb project where this run will be logged.
+                project="outback-nav-ppo",
+                # Track hyperparameters and run metadata.
+                config={
+                    "rl_library": "skrl",
+                    "max_episode_length (seconds)": direct_env.max_episode_length_s,
+                    "algo": agent_cfg.algorithm.class_name,
+                    "sim_dt": direct_env.cfg.sim.dt,
+                    "decimation": direct_env.cfg.decimation,
+                    "num_envs": direct_env.num_envs,
+                },
+            )
+        direct_env._run = wandb_run
 
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):

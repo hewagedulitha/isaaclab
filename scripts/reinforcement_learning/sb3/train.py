@@ -14,6 +14,7 @@ there will be significant overhead in GPU->CPU transfer.
 
 import argparse
 import sys
+import wandb
 
 from isaaclab.app import AppLauncher
 
@@ -55,6 +56,7 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.vec_env import VecNormalize
 
 from isaaclab.envs import (
+    DirectRLEnv,
     DirectMARLEnv,
     DirectMARLEnvCfg,
     DirectRLEnvCfg,
@@ -115,6 +117,26 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
+    
+
+    if isinstance(env.unwrapped, DirectRLEnv):
+        direct_env: DirectRLEnv = env.unwrapped
+        wandb_run = wandb.init(
+                # Set the wandb entity where your project will be logged (generally your team name).
+                entity="hewaged-edith-cowan-university",
+                # Set the wandb project where this run will be logged.
+                project="outback-nav-ppo",
+                # Track hyperparameters and run metadata.
+                config={
+                    "rl_library": "skrl",
+                    "max_episode_length (seconds)": direct_env.max_episode_length_s,
+                    "algo": policy_arch,
+                    "sim_dt": direct_env.cfg.sim.dt,
+                    "decimation": direct_env.cfg.decimation,
+                    "num_envs": direct_env.num_envs,
+                },
+            )
+        direct_env._run = wandb_run
 
     # wrap for video recording
     if args_cli.video:
