@@ -50,7 +50,7 @@ import os
 import random
 from datetime import datetime
 
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.vec_env import VecNormalize
@@ -128,9 +128,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                 project="outback-nav-ppo",
                 # Track hyperparameters and run metadata.
                 config={
-                    "rl_library": "skrl",
+                    "rl_library": "sb3",
                     "max_episode_length (seconds)": direct_env.max_episode_length_s,
-                    "algo": policy_arch,
+                    "algo": "SAC",
                     "sim_dt": direct_env.cfg.sim.dt,
                     "decimation": direct_env.cfg.decimation,
                     "num_envs": direct_env.num_envs,
@@ -165,7 +165,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         )
 
     # create agent from stable baselines
-    agent = PPO(policy_arch, env, verbose=1, **agent_cfg)
+    agent = SAC(policy_arch, env, verbose=1, **agent_cfg)
     # configure the logger
     new_logger = configure(log_dir, ["stdout", "tensorboard"])
     agent.set_logger(new_logger)

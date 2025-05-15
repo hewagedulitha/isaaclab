@@ -63,10 +63,11 @@ import gymnasium as gym
 import os
 import time
 import torch
+import wandb
 
 from rsl_rl.runners import OnPolicyRunner
 
-from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent, DirectRLEnv
 from isaaclab.utils.assets import retrieve_file_path
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
@@ -105,6 +106,25 @@ def main():
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+
+    if isinstance(env.unwrapped, DirectRLEnv):
+        direct_env: DirectRLEnv = env.unwrapped
+        wandb_run = wandb.init(
+                # Set the wandb entity where your project will be logged (generally your team name).
+                entity="hewaged-edith-cowan-university",
+                # Set the wandb project where this run will be logged.
+                project="outback-nav-ppo-eval",
+                # Track hyperparameters and run metadata.
+                config={
+                    "rl_library": "skrl",
+                    "max_episode_length (seconds)": direct_env.max_episode_length_s,
+                    "algo": agent_cfg.algorithm.class_name,
+                    "sim_dt": direct_env.cfg.sim.dt,
+                    "decimation": direct_env.cfg.decimation,
+                    "num_envs": direct_env.num_envs,
+                },
+            )
+        direct_env._run = wandb_run
 
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):

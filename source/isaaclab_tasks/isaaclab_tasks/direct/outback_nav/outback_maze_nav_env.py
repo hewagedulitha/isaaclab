@@ -10,6 +10,8 @@ import torch
 import math
 import numpy as np
 import wandb
+import cv2
+import os
 
 import isaaclab.sim as sim_utils
 from isaaclab.assets import (
@@ -20,13 +22,13 @@ from isaaclab.sensors import ContactSensor, RayCaster
 from isaacsim.robot.wheeled_robots.controllers.differential_controller import DifferentialController
 
 
-from .outback_nav_env_cfg import OutbackNavEnvCfg
+from .outback_maze_env_cfg import OutbackMazeNavEnvCfg
 
 
-class OutbackNavEnv(DirectRLEnv):
-    cfg: OutbackNavEnvCfg
+class OutbackMazeNavEnv(DirectRLEnv):
+    cfg: OutbackMazeNavEnvCfg
 
-    def __init__(self, cfg: OutbackNavEnvCfg, render_mode: str | None = None, **kwargs):
+    def __init__(self, cfg: OutbackMazeNavEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
 
         # Joint position command (deviation from default joint positions)
@@ -119,21 +121,30 @@ class OutbackNavEnv(DirectRLEnv):
         camera = self.scene["camera"]
         # print("[INFO]: Camera Output Shape: ", camera.data.output["rgb"].shape)
         # print(scene["camera"])
-        # print("Received shape of rgb   image: ", scene["camera"].data.output["rgb"].shape)
-        # print("Received shape of depth image: ", scene["camera"].data.output["distance_to_image_plane"].shape)
+        # print("Received shape of semantic_segmentation   image: ", camera.data.output["semantic_segmentation"].shape)
+        # print("Received shape of distance_to_image_plane image: ", camera.data.output["distance_to_image_plane"].shape)
 
+        # sem_seg = torch.squeeze(camera.data.output["semantic_segmentation"].clone(), dim=0).cpu().detach().numpy().astype(np.uint8)
+        # print("Processed shape of sem_seg: ", sem_seg.shape)
+        # print("Processed sem_seg: ", sem_seg)
+        # cwd = os.getcwd()
+        # print("Current directory: ",cwd)
+        # cv2.imshow("sem_seg_1.png", sem_seg)
+        # cv2.waitKey(1)
         # save all camera RGB images
         # cam_images = scene["camera"].data.output["rgb"][..., :3]
         
         # img = cam_images[0].detach().cpu().numpy()
 
-        camera_data = self.scene["camera"].data.output["rgb"] / 255.0
+        # camera_data = self.scene["camera"].data.output["rgb"] / 255.0
         # normalize the camera data for better training results
-        mean_tensor = torch.mean(camera_data, dim=(1, 2), keepdim=True)
-        camera_data -= mean_tensor    
+        # mean_tensor = torch.mean(camera_data, dim=(1, 2), keepdim=True)
+        # camera_data -= mean_tensor    
         # print("[INFO]: camera_data Shape: ", camera_data.shape)                                      
         # obs = torch.zeros(self.num_envs, gym.spaces.flatdim(self.single_observation_space["policy"]), device=self.device)
-        obs = torch.flatten(camera_data.clone(), start_dim=1)
+        obs = torch.flatten(camera.data.output["semantic_segmentation"].clone(), start_dim=1,).float()
+        # print("Processed obs shape: ", obs.shape)
+        # print("Processed obs: ", obs)
         observations = {"policy": obs}
         return observations
 
@@ -174,9 +185,9 @@ class OutbackNavEnv(DirectRLEnv):
             "goal_distance_reward": distance_to_the_goal_error * self.cfg.goal_distance_reward_scale * self.step_dt,
         }
         reward = torch.sum(torch.stack(list(rewards.values())), dim=0)
-        print(f"[INFO]: clash_error: {clash_error}")
-        print(f"[INFO]: goal_distance_error: {distance_to_the_goal_error} ")
-        print(f"rewards: {rewards} reward sum:{reward}")
+        # print(f"[INFO]: clash_error: {clash_error}")
+        # print(f"[INFO]: goal_distance_error: {distance_to_the_goal_error} ")
+        # print(f"rewards: {rewards} reward sum:{reward}")
         # Logging
         for key, value in rewards.items():
             self._episode_sums[key] += value

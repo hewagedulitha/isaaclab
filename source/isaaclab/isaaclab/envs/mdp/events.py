@@ -59,7 +59,7 @@ def randomize_cube_pos(
     # print(f"[INFO]: randomized_pos shape: {randomized_pos.shape} origins shape: {origins.shape}")
     # print(f"[INFO]: randomized_pos: {randomized_pos.dtype} origins: {origins.dtype}")
     randomized_pos += origins
-    object_state[env_ids[:, None], object_ids, :3] = randomized_pos
+    object_state[env_ids[:, None], object_ids, :3] += origins
     rigid_object_collection.write_object_link_pose_to_sim(object_state[env_ids[:, None], object_ids, :7], env_ids=env_ids)
     rigid_object_collection.write_object_com_velocity_to_sim(object_state[env_ids[:, None], object_ids, 7:], env_ids=env_ids)
 
