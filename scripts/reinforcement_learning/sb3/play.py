@@ -51,11 +51,12 @@ import numpy as np
 import os
 import time
 import torch
+import wandb
 
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.vec_env import VecNormalize
 
-from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
+from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent, DirectRLEnv
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.pretrained_checkpoint import get_published_pretrained_checkpoint
 
@@ -103,6 +104,25 @@ def main():
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
+    
+    if isinstance(env.unwrapped, DirectRLEnv):
+        direct_env: DirectRLEnv = env.unwrapped
+        wandb_run = wandb.init(
+                # Set the wandb entity where your project will be logged (generally your team name).
+                entity="hewaged-edith-cowan-university",
+                # Set the wandb project where this run will be logged.
+                project="outback-nav-ppo",
+                # Track hyperparameters and run metadata.
+                config={
+                    "rl_library": "sb3",
+                    "max_episode_length (seconds)": direct_env.max_episode_length_s,
+                    "algo": "SAC",
+                    "sim_dt": direct_env.cfg.sim.dt,
+                    "decimation": direct_env.cfg.decimation,
+                    "num_envs": direct_env.num_envs,
+                },
+            )
+        direct_env._run = wandb_run
 
     # wrap for video recording
     if args_cli.video:
@@ -132,7 +152,7 @@ def main():
 
     # create agent from stable baselines
     print(f"Loading checkpoint from: {checkpoint_path}")
-    agent = PPO.load(checkpoint_path, env, print_system_info=True)
+    agent = SAC.load(checkpoint_path, env, print_system_info=True)
 
     dt = env.unwrapped.physics_dt
 

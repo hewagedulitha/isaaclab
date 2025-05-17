@@ -20,6 +20,7 @@ from isaaclab.assets import (
 from isaaclab.envs import DirectRLEnv
 from isaaclab.sensors import ContactSensor, RayCaster
 from isaacsim.robot.wheeled_robots.controllers.differential_controller import DifferentialController
+from ae.autoencoder import load_ae
 
 
 from .outback_maze_env_cfg import OutbackMazeNavEnvCfg
@@ -65,6 +66,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
         #         "num_envs": self.num_envs,
         #     },
         # )
+        self.autoencoder = load_ae(os.environ["AE_PATH"])
 
 
     def _setup_scene(self):
@@ -90,7 +92,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self.cfg.action_scale: {self.cfg.action_scale}")
         self._processed_actions = self._actions
         linear_speed = 2.0
-        # print(f"[INFO]:_processed_actions: {self._processed_actions}")
+        # print(f"[INFO]:_processed_actions: {self._processed_actions} shape: {self._processed_actions.shape}")
         out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
         joint_vel_targets = torch.stack([self.get_joint_vel_targets(i) for i in out ])
         joint_vel = self._robot.data.default_joint_vel.clone()
@@ -124,7 +126,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # print("Received shape of semantic_segmentation   image: ", camera.data.output["semantic_segmentation"].shape)
         # print("Received shape of distance_to_image_plane image: ", camera.data.output["distance_to_image_plane"].shape)
 
-        # sem_seg = torch.squeeze(camera.data.output["semantic_segmentation"].clone(), dim=0).cpu().detach().numpy().astype(np.uint8)
+        sem_seg = torch.squeeze(camera.data.output["semantic_segmentation"][..., :3].clone(), dim=0).cpu().detach().numpy()
         # print("Processed shape of sem_seg: ", sem_seg.shape)
         # print("Processed sem_seg: ", sem_seg)
         # cwd = os.getcwd()
@@ -133,6 +135,13 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # cv2.waitKey(1)
         # save all camera RGB images
         # cam_images = scene["camera"].data.output["rgb"][..., :3]
+        encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
+        obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
+
+        reconstructed_image = self.autoencoder.decode(encoded_image)[0]
+        cv2.imshow("Original", sem_seg)
+        cv2.imshow("Reconstruction", reconstructed_image)
+        cv2.waitKey(1)
         
         # img = cam_images[0].detach().cpu().numpy()
 
@@ -142,7 +151,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # camera_data -= mean_tensor    
         # print("[INFO]: camera_data Shape: ", camera_data.shape)                                      
         # obs = torch.zeros(self.num_envs, gym.spaces.flatdim(self.single_observation_space["policy"]), device=self.device)
-        obs = torch.flatten(camera.data.output["semantic_segmentation"].clone(), start_dim=1,).float()
+        # obs = torch.flatten(camera.data.output["semantic_segmentation"].clone(), start_dim=1,).float()
         # print("Processed obs shape: ", obs.shape)
         # print("Processed obs: ", obs)
         observations = {"policy": obs}

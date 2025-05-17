@@ -338,10 +338,11 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
     camera = TiledCameraCfg(
         prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link/front_cam",
         # update_period=0.1,
-        height=80,
-        width=80,
+        height=480,
+        width=640,
         data_types=["distance_to_image_plane", "semantic_segmentation"],
-        colorize_semantic_segmentation=False,
+        colorize_semantic_segmentation=True,
+        semantic_segmentation_mapping={"class:cube": (25, 255, 140, 255),},
         spawn=sim_utils.PinholeCameraCfg(
             focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
         ),
@@ -434,10 +435,13 @@ class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
     decimation = 20
     action_scale = 2.0
     #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
-    action_space = gym.spaces.Box(low=float(-1.0), high=float(1.0), shape=(1,), dtype=np.float32)
+    action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
     observation_space = gym.spaces.Box(
-        low=float(1.0), high=float(2.0), shape=(scene.camera.height * scene.camera.width,), dtype=np.float32
-    )  # or for simplicity: [height, width, 3]
+            low=-np.inf,
+            high=np.inf,
+            shape=(32,),
+            dtype=np.float32,
+        )  # or for simplicity: [height, width, 3]
     state_space = 0
 
     # simulation
