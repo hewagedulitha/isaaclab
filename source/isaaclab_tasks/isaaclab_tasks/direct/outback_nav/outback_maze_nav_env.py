@@ -138,10 +138,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
         encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
         obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
 
-        reconstructed_image = self.autoencoder.decode(encoded_image)[0]
-        cv2.imshow("Original", sem_seg)
-        cv2.imshow("Reconstruction", reconstructed_image)
-        cv2.waitKey(1)
+        # reconstructed_image = self.autoencoder.decode(encoded_image)[0]
+        # cv2.imshow("Original", sem_seg)
+        # cv2.imshow("Reconstruction", reconstructed_image)
+        # cv2.waitKey(1)
         
         # img = cam_images[0].detach().cpu().numpy()
 
@@ -173,8 +173,8 @@ class OutbackMazeNavEnv(DirectRLEnv):
         force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
         force_matrices = torch.cat((force_matrices_L, force_matrices_R), dim=-1)
         flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
-        max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
-        died = torch.any(max_force > 1.0, dim=1)
+        # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
+        died = torch.any(flat_force_matrices != 0.0, dim=1)
         clash_error=torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
         clash_error[died] = 1.0
         # if died:
@@ -207,10 +207,19 @@ class OutbackMazeNavEnv(DirectRLEnv):
         force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
         force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
         force_matrices = torch.cat((force_matrices_L, force_matrices_R), dim=-1)
+        # net_forces = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w, self.scene["contact_sensor_R"].data.net_forces_w), dim=-1)
+        # net_forces_w_history = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w_history, self.scene["contact_sensor_R"].data.net_forces_w_history), dim=-1)
+        # last_contact_time = torch.cat((self.scene["contact_sensor_L"].data.last_contact_time, self.scene["contact_sensor_R"].data.last_contact_time), dim=-1)
+        # current_contact_time = torch.cat((self.scene["contact_sensor_L"].data.current_contact_time, self.scene["contact_sensor_R"].data.current_contact_time), dim=-1)
         flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
-        max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
+        # print(f"[INFO]: flat_force_matrices: {flat_force_matrices}")
+        # print(f"[INFO]: net_forces : {net_forces}")
+        # print(f"[INFO]: net_forces_w_history : {net_forces_w_history}")
+        # print("[INFO]: last_contact_time: ", self.scene["contact_sensor_L"].data.last_contact_time)
+        # print(f"[INFO]: current_contact_time : {current_contact_time}")
+        # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         # print(f"[INFO]: force_matrices_L: {force_matrices_L.shape} force_matrices_R:{force_matrices_R.shape} force_matrices:{force_matrices.shape} flat_force_matrices:{flat_force_matrices.shape} max_force: {max_force.shape}")
-        died = torch.any(max_force > 1.0, dim=1)
+        died = torch.any(flat_force_matrices != 0.0, dim=1)
         # print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
         return died, time_out
 

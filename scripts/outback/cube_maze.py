@@ -1,11 +1,45 @@
-import gymnasium as gym
-import numpy as np
-from typing import TYPE_CHECKING, Literal
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 
-if TYPE_CHECKING:
-    from isaaclab.envs import ManagerBasedEnv
+"""This script demonstrates how to use the interactive scene interface to setup a scene with multiple prims.
 
-import isaaclab.envs.mdp as mdp
+.. code-block:: bash
+
+    # Usage
+    ./isaaclab.sh -p scripts/tutorials/02_scene/create_scene.py --num_envs 32
+
+"""
+
+"""Launch Isaac Sim Simulator first."""
+
+
+import argparse
+
+from isaaclab.app import AppLauncher
+
+# add argparse arguments
+parser = argparse.ArgumentParser(description="Tutorial on using the interactive scene interface.")
+parser.add_argument("--num_envs", type=int, default=2, help="Number of environments to spawn.")
+# append AppLauncher cli args
+AppLauncher.add_app_launcher_args(parser)
+# parse the arguments
+args_cli = parser.parse_args()
+
+# launch omniverse app
+app_launcher = AppLauncher(args_cli)
+simulation_app = app_launcher.app
+
+"""Rest everything follows."""
+
+import torch
+
+import isaaclab.sim as sim_utils
+from isaaclab.assets import ArticulationCfg, AssetBaseCfg
+from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
+from isaaclab.sim import SimulationContext
+from isaaclab.utils import configclass
 from isaaclab.envs import DirectRLEnvCfg
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import SceneEntityCfg
@@ -32,38 +66,79 @@ from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.sensors import ContactSensorCfg
 from isaaclab.sensors import CameraCfg, RayCasterCameraCfg, TiledCameraCfg, LidarCfg
 from isaaclab.sensors.ray_caster import RayCasterCfg, patterns
-
+import isaacsim.core.utils.prims as prim_utils
 
 ##
 # Pre-defined configs
 ##
-from isaaclab_assets.robots.anymal import ANYMAL_C_CFG  # isort: skip
-from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
+from isaaclab_assets import CARTPOLE_CFG  # isort:skip
+
+def design_scene():
+
+    """Designs the scene by spawning ground plane, light, objects and meshes from usd files."""
+
+    # Ground-plane
+    cfg_ground = sim_utils.GroundPlaneCfg()
+    cfg_ground.func("/World/defaultGroundPlane", cfg_ground)
 
 
-@configclass
-class EventCfg:
-    """Configuration for randomization."""
-
-    box_pos = EventTerm(
-        func=mdp.randomize_cube_pos,
-        mode="reset",
-        params={
-            "asset_cfg": SceneEntityCfg("object_collection"),
-        },
+    # spawn distant light
+    cfg_light_distant = sim_utils.DistantLightCfg(
+        intensity=3000.0,
+        color=(0.75, 0.75, 0.75),
     )
 
-##
+    cfg_light_distant.func("/World/lightDistant", cfg_light_distant, translation=(1, 0, 10))
 
-# Scene Configuration
 
-##
+    # create a new xform prim for all objects to be spawned under
+    prim_utils.create_prim("/World/Objects", "Xform")
+
+    # spawn a red cone
+    cfg_cone = sim_utils.ConeCfg(
+        radius=0.15,
+        height=0.5,
+        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0)),
+    )
+
+    cfg_cone.func("/World/Objects/Cone1", cfg_cone, translation=(-1.0, 1.0, 1.0))
+    cfg_cone.func("/World/Objects/Cone2", cfg_cone, translation=(-1.0, -1.0, 1.0))
+
+
+    # spawn a green cone with colliders and rigid body
+    cfg_cone_rigid = sim_utils.ConeCfg(
+        radius=0.15,
+        height=0.5,
+        rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+        mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+        collision_props=sim_utils.CollisionPropertiesCfg(),
+        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 1.0, 0.0)),
+    )
+
+    cfg_cone_rigid.func(
+        "/World/Objects/ConeRigid", cfg_cone_rigid, translation=(-0.2, 0.0, 2.0), orientation=(0.5, 0.0, 0.5, 0.0)
+    )
+
+    # spawn a blue cuboid with deformable body
+    cfg_cuboid_deformable = sim_utils.MeshCuboidCfg(
+        size=(0.2, 0.5, 0.2),
+        deformable_props=sim_utils.DeformableBodyPropertiesCfg(),
+        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0)),
+        physics_material=sim_utils.DeformableBodyMaterialCfg(),
+    )
+    cfg_cuboid_deformable.func("/World/Objects/CuboidDeformable", cfg_cuboid_deformable, translation=(0.15, 0.0, 2.0))
+
+
+    # spawn a usd file of a table into the scene
+    cfg = sim_utils.UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd")
+    cfg.func("/World/Objects/Table", cfg, translation=(0.0, 0.0, 1.05))
+
 
 @configclass
-class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
-    """Configuration for a multi-object scene."""
+class CubeMazeSceneCfg(InteractiveSceneCfg):
+    """Configuration for a cart-pole scene."""
 
-    # ground plane
+      # ground plane
     ground = AssetBaseCfg(prim_path="/World/defaultGroundPlane", spawn=sim_utils.GroundPlaneCfg())
 
     robot = ArticulationCfg(
@@ -526,48 +601,68 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
         prim_path="/World/Light", spawn=sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
     )
 
-@configclass
-class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
-    # scene
-    scene: OutbackMazeEnvSceneCfg = OutbackMazeEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
 
-    # events
-    events: EventCfg = EventCfg()
+def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
+    """Runs the simulation loop."""
+    # Extract scene entities
+    # note: we only do this here for readability.
+    # robot = scene["cartpole"]
+    # Define simulation stepping
+    sim_dt = sim.get_physics_dt()
+    count = 0
+    # Simulation loop
+    while simulation_app.is_running():
+        # -- write data to sim
+        # scene.write_data_to_sim()
+        # Perform step
+        sim.step()
+        # Increment counter
+        count += 1
+        # Update buffers
+        # scene.update(sim_dt)
 
-    # robot
-    # robot: ArticulationCfg = ANYMAL_C_CFG.replace(prim_path="/World/envs/env_.*/Robot")
-    # contact_sensor: ContactSensorCfg = ContactSensorCfg(
-    #     prim_path="/World/envs/env_.*/Robot/.*", history_length=3, update_period=0.005, track_air_time=True
-    # )
 
-    # env
-    episode_length_s = 80.0
-    decimation = 4
-    action_scale = 2.0
-    #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
-    action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
-    observation_space = gym.spaces.Box(
-            low=-np.inf,
-            high=np.inf,
-            shape=(32,),
-            dtype=np.float32,
-        )  # or for simplicity: [height, width, 3]
-    state_space = 0
+def main():
 
-    # simulation
-    sim: SimulationCfg = SimulationCfg(
-        dt=1 / 100,
-        render_interval=decimation,
-        physics_material=sim_utils.RigidBodyMaterialCfg(
-            friction_combine_mode="multiply",
-            restitution_combine_mode="multiply",
-            static_friction=1.0,
-            dynamic_friction=1.0,
-            restitution=0.0,
-        ),
-    )
+    """Main function."""
 
-    # reward scales
-    goal_reward_scale = 20.0
-    clash_reward_scale = -10.0
-    goal_distance_reward_scale = 10.0
+
+    # Initialize the simulation context
+
+    sim_cfg = sim_utils.SimulationCfg(dt=0.01, device=args_cli.device)
+
+    sim = sim_utils.SimulationContext(sim_cfg)
+
+    # Set main camera
+
+    sim.set_camera_view([2.0, 0.0, 2.5], [-0.5, 0.0, 0.5])
+
+
+    # Design scene by adding assets to it
+
+    design_scene()
+
+
+    # Play the simulator
+
+    sim.reset()
+
+    # Now we are ready!
+
+    print("[INFO]: Setup complete...")
+
+
+    # Simulate physics
+
+    while simulation_app.is_running():
+
+        # perform step
+
+        sim.step()
+
+
+if __name__ == "__main__":
+    # run the main function
+    main()
+    # close sim app
+    simulation_app.close()
