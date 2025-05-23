@@ -66,72 +66,11 @@ from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.sensors import ContactSensorCfg
 from isaaclab.sensors import CameraCfg, RayCasterCameraCfg, TiledCameraCfg, LidarCfg
 from isaaclab.sensors.ray_caster import RayCasterCfg, patterns
-import isaacsim.core.utils.prims as prim_utils
 
 ##
 # Pre-defined configs
 ##
 from isaaclab_assets import CARTPOLE_CFG  # isort:skip
-
-def design_scene():
-
-    """Designs the scene by spawning ground plane, light, objects and meshes from usd files."""
-
-    # Ground-plane
-    cfg_ground = sim_utils.GroundPlaneCfg()
-    cfg_ground.func("/World/defaultGroundPlane", cfg_ground)
-
-
-    # spawn distant light
-    cfg_light_distant = sim_utils.DistantLightCfg(
-        intensity=3000.0,
-        color=(0.75, 0.75, 0.75),
-    )
-
-    cfg_light_distant.func("/World/lightDistant", cfg_light_distant, translation=(1, 0, 10))
-
-
-    # create a new xform prim for all objects to be spawned under
-    prim_utils.create_prim("/World/Objects", "Xform")
-
-    # spawn a red cone
-    cfg_cone = sim_utils.ConeCfg(
-        radius=0.15,
-        height=0.5,
-        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0)),
-    )
-
-    cfg_cone.func("/World/Objects/Cone1", cfg_cone, translation=(-1.0, 1.0, 1.0))
-    cfg_cone.func("/World/Objects/Cone2", cfg_cone, translation=(-1.0, -1.0, 1.0))
-
-
-    # spawn a green cone with colliders and rigid body
-    cfg_cone_rigid = sim_utils.ConeCfg(
-        radius=0.15,
-        height=0.5,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-        mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
-        collision_props=sim_utils.CollisionPropertiesCfg(),
-        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 1.0, 0.0)),
-    )
-
-    cfg_cone_rigid.func(
-        "/World/Objects/ConeRigid", cfg_cone_rigid, translation=(-0.2, 0.0, 2.0), orientation=(0.5, 0.0, 0.5, 0.0)
-    )
-
-    # spawn a blue cuboid with deformable body
-    cfg_cuboid_deformable = sim_utils.MeshCuboidCfg(
-        size=(0.2, 0.5, 0.2),
-        deformable_props=sim_utils.DeformableBodyPropertiesCfg(),
-        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0)),
-        physics_material=sim_utils.DeformableBodyMaterialCfg(),
-    )
-    cfg_cuboid_deformable.func("/World/Objects/CuboidDeformable", cfg_cuboid_deformable, translation=(0.15, 0.0, 2.0))
-
-
-    # spawn a usd file of a table into the scene
-    cfg = sim_utils.UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd")
-    cfg.func("/World/Objects/Table", cfg, translation=(0.0, 0.0, 1.05))
 
 
 @configclass
@@ -163,7 +102,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
             activate_contact_sensors=True,
         ),
         init_state=ArticulationCfg.InitialStateCfg(
-            pos=(-24.0, 24.0, 2.0), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0}
+            pos=(0.0, 24.0, 2.0), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0}
         ),
         actuators={
             "all_joints": ImplicitActuatorCfg(
@@ -403,7 +342,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(20.0, 8.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(28.0, 8.0, 4.0)),
             ),
                "cube_4": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_4",
@@ -419,20 +358,20 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                 ),
                 init_state=RigidObjectCfg.InitialStateCfg(pos=(32.0, -16.0, 4.0)),
             ),
-               "cube_5": RigidObjectCfg(
-                prim_path="/World/envs/env_.*/Cube_5",
-                spawn=sim_utils.CuboidCfg(
-                    size=(8.0, 8.0, 8.0),
-                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
-                    rigid_props=sim_utils.RigidBodyPropertiesCfg(
-                        solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
-                    ),
-                    mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
-                    collision_props=sim_utils.CollisionPropertiesCfg(),
-                    semantic_tags=[("class", "cube")],
-                ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(24.0, -32.0, 4.0)),
-            ),
+            #    "cube_5": RigidObjectCfg(
+            #     prim_path="/World/envs/env_.*/Cube_5",
+            #     spawn=sim_utils.CuboidCfg(
+            #         size=(8.0, 8.0, 8.0),
+            #         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+            #         rigid_props=sim_utils.RigidBodyPropertiesCfg(
+            #             solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
+            #         ),
+            #         mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+            #         collision_props=sim_utils.CollisionPropertiesCfg(),
+            #         semantic_tags=[("class", "cube")],
+            #     ),
+            #     init_state=RigidObjectCfg.InitialStateCfg(pos=(24.0, -32.0, 4.0)),
+            # ),
                "cube_6": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_6",
                 spawn=sim_utils.CuboidCfg(
@@ -445,7 +384,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(16.0, -20.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(16.0, -28.0, 4.0)),
             ),
                "cube_7": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_7",
@@ -487,7 +426,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(-20.0, 16.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(-28.0, 16.0, 4.0)),
             ),
                "cube_10": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_10",
@@ -623,42 +562,21 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
 
 def main():
-
     """Main function."""
-
-
-    # Initialize the simulation context
-
-    sim_cfg = sim_utils.SimulationCfg(dt=0.01, device=args_cli.device)
-
-    sim = sim_utils.SimulationContext(sim_cfg)
-
+    # Load kit helper
+    sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
+    sim = SimulationContext(sim_cfg)
     # Set main camera
-
-    sim.set_camera_view([2.0, 0.0, 2.5], [-0.5, 0.0, 0.5])
-
-
-    # Design scene by adding assets to it
-
-    design_scene()
-
-
+    sim.set_camera_view([2.5, 0.0, 4.0], [0.0, 0.0, 2.0])
+    # Design scene
+    scene_cfg = CubeMazeSceneCfg(num_envs=args_cli.num_envs, env_spacing=2.0)
+    scene = InteractiveScene(scene_cfg)
     # Play the simulator
-
     sim.reset()
-
     # Now we are ready!
-
     print("[INFO]: Setup complete...")
-
-
-    # Simulate physics
-
-    while simulation_app.is_running():
-
-        # perform step
-
-        sim.step()
+    # Run the simulator
+    run_simulator(sim, scene)
 
 
 if __name__ == "__main__":

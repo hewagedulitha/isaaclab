@@ -71,6 +71,8 @@ from isaaclab_rl.sb3 import Sb3VecEnvWrapper, process_sb3_cfg
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
+from wandb.integration.sb3 import WandbCallback
+
 # PLACEHOLDER: Extension template (do not remove this comment)
 
 
@@ -134,7 +136,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                     "sim_dt": direct_env.cfg.sim.dt,
                     "decimation": direct_env.cfg.decimation,
                     "num_envs": direct_env.num_envs,
+                    "starting_pos": "first_turn",
                 },
+                sync_tensorboard=True,
             )
         direct_env._run = wandb_run
 
@@ -165,7 +169,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         )
 
     # create agent from stable baselines
-    agent = SAC(policy_arch, env, verbose=1, **agent_cfg)
+    agent = SAC(policy_arch, env, verbose=1, tensorboard_log=f"runs/{wandb_run.id}", **agent_cfg)
     # configure the logger
     new_logger = configure(log_dir, ["stdout", "tensorboard"])
     agent.set_logger(new_logger)
@@ -173,7 +177,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # callbacks for agent
     checkpoint_callback = CheckpointCallback(save_freq=1000, save_path=log_dir, name_prefix="model", verbose=2)
     # train the agent
-    agent.learn(total_timesteps=n_timesteps, callback=checkpoint_callback)
+    agent.learn(total_timesteps=n_timesteps, callback=[checkpoint_callback, WandbCallback()])
     # save the final model
     agent.save(os.path.join(log_dir, "model"))
 

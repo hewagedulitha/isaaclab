@@ -194,9 +194,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
             "goal_distance_reward": distance_to_the_goal_error * self.cfg.goal_distance_reward_scale * self.step_dt,
         }
         reward = torch.sum(torch.stack(list(rewards.values())), dim=0)
-        # print(f"[INFO]: clash_error: {clash_error}")
-        # print(f"[INFO]: goal_distance_error: {distance_to_the_goal_error} ")
-        # print(f"rewards: {rewards} reward sum:{reward}")
+        print(f"[INFO]: clash_error: {clash_error}")
+        print(f"[INFO]: goal_distance_error: {distance_to_the_goal_error} ")
+        print(f"[INFO]: goal_reward: {goal_error} ")
+        print(f"rewards: {rewards} reward sum:{reward}")
         # Logging
         for key, value in rewards.items():
             self._episode_sums[key] += value
@@ -220,7 +221,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         # print(f"[INFO]: force_matrices_L: {force_matrices_L.shape} force_matrices_R:{force_matrices_R.shape} force_matrices:{force_matrices.shape} flat_force_matrices:{flat_force_matrices.shape} max_force: {max_force.shape}")
         died = torch.any(flat_force_matrices != 0.0, dim=1)
-        # print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
+        print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
         return died, time_out
 
     def _reset_idx(self, env_ids: torch.Tensor | None):
@@ -237,6 +238,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
         self._previous_actions[env_ids] = 0.0
         # Reset robot state
         root_state = self._robot.data.default_root_state.clone()
+        # print(f"[INFO]: root_state: {root_state}")
         root_state[env_ids, :3] += self.scene.env_origins[env_ids, :]
         joint_pos, joint_vel = self._robot.data.default_joint_pos.clone(), self._robot.data.default_joint_vel.clone()
         self._robot.write_root_pose_to_sim(root_state[env_ids, :7], env_ids= env_ids)
