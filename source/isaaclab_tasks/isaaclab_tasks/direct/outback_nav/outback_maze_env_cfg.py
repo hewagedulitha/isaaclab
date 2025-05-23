@@ -91,8 +91,8 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
             activate_contact_sensors=True,
         ),
         init_state=ArticulationCfg.InitialStateCfg(
-                        # pos=(-24.0, 24.0, 2.0), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
-            pos=(-0.0, 24.0, 2.0), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+                        pos=(-24.0, 24.0, 2.0), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+            # pos=(-0.0, 24.0, 2.0), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
         ),
         actuators={
             "all_joints": ImplicitActuatorCfg(
@@ -191,6 +191,34 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                         semantic_tags=[("class", "cube")],
                     ),
                     init_state=AssetBaseCfg.InitialStateCfg(pos=(40.0, -12.0, 4.0)),
+            )
+    static_cube4 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_4", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0, 8.0*2, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(8.0, -28.0, 4.0)),
+            )
+    static_cube5 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_5", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0*2, 8.0, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(12.0, -40.0, 4.0)),
             )
     # cube_2 = AssetBaseCfg(
     #             prim_path="/World/envs/env_.*/Cube_2",
@@ -352,7 +380,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                "cube_3": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_3",
                 spawn=sim_utils.CuboidCfg(
-                    size=(8.0*4, 8.0, 8.0),
+                    size=(8.0*3, 8.0, 8.0),
                     visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
                     rigid_props=sim_utils.RigidBodyPropertiesCfg(
                         solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
@@ -361,7 +389,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(20.0, 8.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(24.0, 8.0, 4.0)),
             ),
                "cube_4": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_4",
@@ -377,24 +405,24 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                 ),
                 init_state=RigidObjectCfg.InitialStateCfg(pos=(32.0, -16.0, 4.0)),
             ),
-               "cube_5": RigidObjectCfg(
-                prim_path="/World/envs/env_.*/Cube_5",
-                spawn=sim_utils.CuboidCfg(
-                    size=(8.0, 8.0, 8.0),
-                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
-                    rigid_props=sim_utils.RigidBodyPropertiesCfg(
-                        solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
-                    ),
-                    mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
-                    collision_props=sim_utils.CollisionPropertiesCfg(),
-                    semantic_tags=[("class", "cube")],
-                ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(24.0, -32.0, 4.0)),
-            ),
+            #    "cube_5": RigidObjectCfg(
+            #     prim_path="/World/envs/env_.*/Cube_5",
+            #     spawn=sim_utils.CuboidCfg(
+            #         size=(8.0, 8.0, 8.0),
+            #         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+            #         rigid_props=sim_utils.RigidBodyPropertiesCfg(
+            #             solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
+            #         ),
+            #         mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+            #         collision_props=sim_utils.CollisionPropertiesCfg(),
+            #         semantic_tags=[("class", "cube")],
+            #     ),
+            #     init_state=RigidObjectCfg.InitialStateCfg(pos=(24.0, -32.0, 4.0)),
+            # ),
                "cube_6": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_6",
                 spawn=sim_utils.CuboidCfg(
-                    size=(8.0, 8.0*4, 8.0),
+                    size=(8.0, 8.0*3, 8.0),
                     visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
                     rigid_props=sim_utils.RigidBodyPropertiesCfg(
                         solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
@@ -403,7 +431,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(16.0, -20.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(16.0, -24.0, 4.0)),
             ),
                "cube_7": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_7",
@@ -445,7 +473,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(-20.0, 16.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(-28.0, 16.0, 4.0)),
             ),
                "cube_10": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_10",

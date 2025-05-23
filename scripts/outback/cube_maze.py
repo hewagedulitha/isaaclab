@@ -131,48 +131,76 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
     #     debug_vis=True,
     # )
 
-    # rigid object
-    # object: RigidObjectCfg = RigidObjectCfg(
-    #     prim_path="/World/envs/env_.*/Object",
-    #     spawn=sim_utils.MultiAssetSpawnerCfg(
-    #         assets_cfg=[
-    #             sim_utils.ConeCfg(
-    #                 radius=0.3,
-    #                 height=0.6,
-    #                 visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 1.0, 0.0), metallic=0.2),
-    #             ),
-    #             sim_utils.CuboidCfg(
-    #                 size=(0.3, 0.3, 0.3),
-    #                 visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
-    #             ),
-    #             sim_utils.SphereCfg(
-    #                 radius=0.3,
-    #                 visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0), metallic=0.2),
-    #             ),
-    #         ],
-    #         random_choice=True,
-    #         rigid_props=sim_utils.RigidBodyPropertiesCfg(
-    #             solver_position_iteration_count=4, solver_velocity_iteration_count=0
-    #         ),
-    #         mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
-    #         collision_props=sim_utils.CollisionPropertiesCfg(),
-    #     ),
-    #     init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 0.0, 2.0)),
-    # )
-
-    # cube1 = AssetBaseCfg(
-    #                 prim_path="/World/envs/env_.*/Cube_1", spawn=sim_utils.CuboidCfg(
-    #                 size=(8.0*6, 8.0, 8.0),
-    #                 visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
-    #                 # rigid_props=sim_utils.RigidBodyPropertiesCfg(
-    #                 #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
-    #                 # ),
-    #                 # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
-    #                 collision_props=sim_utils.CollisionPropertiesCfg(),
-    #                 semantic_tags=[("class", "cube")],
-    #             ),
-    #             init_state=RigidObjectCfg.InitialStateCfg(pos=(-12.0, 32.0, 4.0)),
-    #         )
+    static_cube1 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_1", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0, 8.0*3, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(16.0, 24.0, 4.0)),
+            )
+    static_cube2 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_2", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0*3, 8.0, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, -16.0, 4.0)),
+            )
+    static_cube3 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_3", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0, 8.0*6, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(40.0, -12.0, 4.0)),
+            )
+    static_cube4 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_4", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0, 8.0*2, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(8.0, -28.0, 4.0)),
+            )
+    static_cube5 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_5", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0*2, 8.0, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(16.0, 8.0, 4.0)),
+            )
     # cube_2 = AssetBaseCfg(
     #             prim_path="/World/envs/env_.*/Cube_2",
     #             spawn=sim_utils.CuboidCfg(
@@ -333,7 +361,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                "cube_3": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_3",
                 spawn=sim_utils.CuboidCfg(
-                    size=(8.0*4, 8.0, 8.0),
+                    size=(8.0*3, 8.0, 8.0),
                     visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
                     rigid_props=sim_utils.RigidBodyPropertiesCfg(
                         solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
@@ -342,7 +370,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(28.0, 8.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(24.0, 8.0, 4.0)),
             ),
                "cube_4": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_4",
@@ -375,7 +403,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                "cube_6": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_6",
                 spawn=sim_utils.CuboidCfg(
-                    size=(8.0, 8.0*4, 8.0),
+                    size=(8.0, 8.0*3, 8.0),
                     visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
                     rigid_props=sim_utils.RigidBodyPropertiesCfg(
                         solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
@@ -384,7 +412,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(16.0, -28.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(16.0, -24.0, 4.0)),
             ),
                "cube_7": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_7",
@@ -444,6 +472,7 @@ class CubeMazeSceneCfg(InteractiveSceneCfg):
             ),
         }
     )
+
 
     # Camera
     # camera = CameraCfg(

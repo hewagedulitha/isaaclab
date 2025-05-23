@@ -138,10 +138,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
         encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
         obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
 
-        # reconstructed_image = self.autoencoder.decode(encoded_image)[0]
-        # cv2.imshow("Original", sem_seg)
-        # cv2.imshow("Reconstruction", reconstructed_image)
-        # cv2.waitKey(1)
+        reconstructed_image = self.autoencoder.decode(encoded_image)[0]
+        cv2.imshow("Original", sem_seg)
+        cv2.imshow("Reconstruction", reconstructed_image)
+        cv2.waitKey(1)
         
         # img = cam_images[0].detach().cpu().numpy()
 
