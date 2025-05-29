@@ -92,7 +92,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
         ),
         init_state=ArticulationCfg.InitialStateCfg(
                         pos=(-24.0, 24.0, 2.0), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
-            # pos=(-0.0, 24.0, 2.0), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+            # pos=(24.0, -18.0, 2.0), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
         ),
         actuators={
             "all_joints": ImplicitActuatorCfg(
@@ -631,4 +631,4 @@ class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
     # reward scales
     goal_reward_scale = 20.0
     clash_reward_scale = -10.0
-    goal_distance_reward_scale = 10.0
+    goal_distance_reward_scale = 1.0

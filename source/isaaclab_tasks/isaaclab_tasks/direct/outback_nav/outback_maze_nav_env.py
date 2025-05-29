@@ -138,10 +138,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
         encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
         obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
 
-        reconstructed_image = self.autoencoder.decode(encoded_image)[0]
-        cv2.imshow("Original", sem_seg)
-        cv2.imshow("Reconstruction", reconstructed_image)
-        cv2.waitKey(1)
+        # reconstructed_image = self.autoencoder.decode(encoded_image)[0]
+        # cv2.imshow("Original", sem_seg)
+        # cv2.imshow("Reconstruction", reconstructed_image)
+        # cv2.waitKey(1)
         
         # img = cam_images[0].detach().cpu().numpy()
 
@@ -183,21 +183,21 @@ class OutbackMazeNavEnv(DirectRLEnv):
         
         #goal
         x_in_goal = torch.logical_and(20.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
-        y_in_goal =  torch.logical_and(20.0 < body_pose[:, 1], body_pose[:, 1]  < 28.0)
+        y_in_goal =  torch.logical_and(-20.0 > body_pose[:, 1], body_pose[:, 1]  > -28.0)
         in_goal = torch.logical_and(x_in_goal, y_in_goal)
         goal_error = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
         goal_error[in_goal] = 1.0
 
         rewards = {
-            "goal_reward": goal_error * self.cfg.goal_reward_scale * self.step_dt,
-            "clash_reward": clash_error * self.cfg.clash_reward_scale * self.step_dt,
-            "goal_distance_reward": distance_to_the_goal_error * self.cfg.goal_distance_reward_scale * self.step_dt,
+            "goal_reward": goal_error * self.cfg.goal_reward_scale,
+            "clash_reward": clash_error * self.cfg.clash_reward_scale,
+            "goal_distance_reward": distance_to_the_goal_error * self.cfg.goal_distance_reward_scale,
         }
         reward = torch.sum(torch.stack(list(rewards.values())), dim=0)
-        print(f"[INFO]: clash_error: {clash_error}")
-        print(f"[INFO]: goal_distance_error: {distance_to_the_goal_error} ")
-        print(f"[INFO]: goal_reward: {goal_error} ")
-        print(f"rewards: {rewards} reward sum:{reward}")
+        # print(f"[INFO]: clash_error: {clash_error}")
+        # print(f"[INFO]: goal_distance_error: {distance_to_the_goal_error} ")
+        # print(f"[INFO]: goal_reward: {goal_error} ")
+        # print(f"rewards: {rewards} reward sum:{reward}")
         # Logging
         for key, value in rewards.items():
             self._episode_sums[key] += value
@@ -205,6 +205,15 @@ class OutbackMazeNavEnv(DirectRLEnv):
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
         time_out = self.episode_length_buf >= self.max_episode_length - 1
+
+        body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
+        # print(f"[INFO]: body_pose : {body_pose}")
+        x_in_goal = torch.logical_and(20.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
+        y_in_goal =  torch.logical_and(-20.0 > body_pose[:, 1], body_pose[:, 1]  > -28.0)
+        in_goal = torch.logical_and(x_in_goal, y_in_goal)
+        # print(f"[INFO]: in_goal : {in_goal}")
+
+        time_out = torch.logical_or(time_out, in_goal)
         force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
         force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
         force_matrices = torch.cat((force_matrices_L, force_matrices_R), dim=-1)
@@ -221,7 +230,9 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         # print(f"[INFO]: force_matrices_L: {force_matrices_L.shape} force_matrices_R:{force_matrices_R.shape} force_matrices:{force_matrices.shape} flat_force_matrices:{flat_force_matrices.shape} max_force: {max_force.shape}")
         died = torch.any(flat_force_matrices != 0.0, dim=1)
-        print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
+        if died or time_out:
+            print(f"[INFO]: self.episode_length_buf : {self.episode_length_buf}  self.max_episode_length :{ self.max_episode_length }")
+            print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
         return died, time_out
 
     def _reset_idx(self, env_ids: torch.Tensor | None):
