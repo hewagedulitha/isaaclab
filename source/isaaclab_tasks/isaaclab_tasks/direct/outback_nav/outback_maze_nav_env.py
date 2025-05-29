@@ -138,10 +138,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
         encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
         obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
 
-        # reconstructed_image = self.autoencoder.decode(encoded_image)[0]
-        # cv2.imshow("Original", sem_seg)
-        # cv2.imshow("Reconstruction", reconstructed_image)
-        # cv2.waitKey(1)
+        reconstructed_image = self.autoencoder.decode(encoded_image)[0]
+        cv2.imshow("Original", sem_seg)
+        cv2.imshow("Reconstruction", reconstructed_image)
+        cv2.waitKey(1)
         
         # img = cam_images[0].detach().cpu().numpy()
 
@@ -241,10 +241,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
             env_ids = self._robot._ALL_INDICES
         self._robot.reset(env_ids)
         super()._reset_idx(env_ids)
-        if len(env_ids) == self.num_envs:
-            # Spread out the resets to avoid spikes in training when many environments reset at a similar time
-            # print("[INFO] Resetting all indices")
-            self.episode_length_buf[:] = torch.randint_like(self.episode_length_buf, high=int(self.max_episode_length))
+        # if len(env_ids) == self.num_envs:
+        #     # Spread out the resets to avoid spikes in training when many environments reset at a similar time
+        #     # print("[INFO] Resetting all indices")
+        #     self.episode_length_buf[:] = torch.randint_like(self.episode_length_buf, high=int(self.max_episode_length))
         self._actions[env_ids] = 0.0
         self._previous_actions[env_ids] = 0.0
         # Reset robot state
