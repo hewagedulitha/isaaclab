@@ -461,10 +461,10 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                 ),
                 init_state=RigidObjectCfg.InitialStateCfg(pos=(-8.0, 4.0, 4.0)),
             ),
-               "cube_9": RigidObjectCfg(
-                prim_path="/World/envs/env_.*/Cube_9",
+             "cube_corner_1": RigidObjectCfg(
+                prim_path="/World/envs/env_.*/Cube_Corner_1",
                 spawn=sim_utils.CuboidCfg(
-                    size=(8.0*4, 8.0, 8.0),
+                    size=(8.0, 8.0, 8.0),
                     visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
                     rigid_props=sim_utils.RigidBodyPropertiesCfg(
                         solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
@@ -473,7 +473,21 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                     collision_props=sim_utils.CollisionPropertiesCfg(),
                     semantic_tags=[("class", "cube")],
                 ),
-                init_state=RigidObjectCfg.InitialStateCfg(pos=(-28.0, 16.0, 4.0)),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(-8.0, 16.0, 4.0)),
+            ),
+               "cube_9": RigidObjectCfg(
+                prim_path="/World/envs/env_.*/Cube_9",
+                spawn=sim_utils.CuboidCfg(
+                    size=(8.0*3, 8.0, 8.0),
+                    visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                    rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        solver_position_iteration_count=4, solver_velocity_iteration_count=0, kinematic_enabled=False,
+                    ),
+                    mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                    collision_props=sim_utils.CollisionPropertiesCfg(),
+                    semantic_tags=[("class", "cube")],
+                ),
+                init_state=RigidObjectCfg.InitialStateCfg(pos=(-24.0, 16.0, 4.0)),
             ),
                "cube_10": RigidObjectCfg(
                 prim_path="/World/envs/env_.*/Cube_10",
@@ -554,12 +568,13 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
             "{ENV_REGEX_NS}/Cube_2",
             "{ENV_REGEX_NS}/Cube_3",
             "{ENV_REGEX_NS}/Cube_4",
-            "{ENV_REGEX_NS}/Cube_5",
+            # "{ENV_REGEX_NS}/Cube_5",
             "{ENV_REGEX_NS}/Cube_6",
             "{ENV_REGEX_NS}/Cube_7",
             "{ENV_REGEX_NS}/Cube_8",
             "{ENV_REGEX_NS}/Cube_9",
             "{ENV_REGEX_NS}/Cube_10",
+            "{ENV_REGEX_NS}/Cube_Corner_1",
             ],
     )
 
@@ -573,12 +588,13 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
             "{ENV_REGEX_NS}/Cube_2",
             "{ENV_REGEX_NS}/Cube_3",
             "{ENV_REGEX_NS}/Cube_4",
-            "{ENV_REGEX_NS}/Cube_5",
+            # "{ENV_REGEX_NS}/Cube_5",
             "{ENV_REGEX_NS}/Cube_6",
             "{ENV_REGEX_NS}/Cube_7",
             "{ENV_REGEX_NS}/Cube_8",
             "{ENV_REGEX_NS}/Cube_9",
             "{ENV_REGEX_NS}/Cube_10",
+            "{ENV_REGEX_NS}/Cube_Corner_1",
             ],
     )
 
