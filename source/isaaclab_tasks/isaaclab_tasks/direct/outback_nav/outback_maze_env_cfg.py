@@ -220,6 +220,20 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
                     ),
                     init_state=AssetBaseCfg.InitialStateCfg(pos=(12.0, -40.0, 4.0)),
             )
+    static_cube6 = AssetBaseCfg(
+                    prim_path="/World/envs/env_.*/S_Cube_6", 
+                    spawn=sim_utils.CuboidCfg(
+                        size=(8.0, 8.0*2, 8.0),
+                        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0), metallic=0.2),
+                        # rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                        #     solver_position_iteration_count=4, solver_velocity_iteration_count=0
+                        # ),
+                        # mass_props=sim_utils.MassPropertiesCfg(mass=1.0),
+                        collision_props=sim_utils.CollisionPropertiesCfg(),
+                        semantic_tags=[("class", "cube")],
+                    ),
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=(-16.0, 4.0, 4.0)),
+            )
     # cube_2 = AssetBaseCfg(
     #             prim_path="/World/envs/env_.*/Cube_2",
     #             spawn=sim_utils.CuboidCfg(
