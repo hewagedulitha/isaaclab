@@ -59,28 +59,24 @@ def randomize_cube_pos(
     # print(f"[INFO]: randomized_pos shape: {randomized_pos.shape} origins shape: {origins.shape}")
     # print(f"[INFO]: randomized_pos: {randomized_pos.dtype} origins: {origins.dtype}")
     randomized_pos += origins
-    object_state[env_ids[:, None], object_ids, :3] += origins
+    object_state[env_ids[:, None], object_ids, :3] = randomized_pos
     rigid_object_collection.write_object_link_pose_to_sim(object_state[env_ids[:, None], object_ids, :7], env_ids=env_ids)
     rigid_object_collection.write_object_com_velocity_to_sim(object_state[env_ids[:, None], object_ids, 7:], env_ids=env_ids)
 
 def randomized_box_pos(env: ManagerBasedEnv) -> torch.Tensor:
     boxes_pos = [
-                    [[-8, 32, 4], [0.0, 32, 4], [8, 32, 4], [-8, 24, 4], [0.0, 24, 4], [8, 24, 4], [-8, 16, 4], [0.0, 16, 4], [8, 16, 4],],
-                    [[16, 32, 4], [24, 32, 4], [32, 32, 4], [16, 24, 4], [24, 24, 4], [32, 24, 4], [16, 16, 4], [24, 16, 4], [32, 16, 4],],
-                    [[-32, 8, 4], [-24, 8, 4], [-16, 8, 4], [-32, 0.0, 4], [-24, 0.0, 4], [-16, 0.0, 4], [-32, -8, 4], [-24, -8, 4], [-16, -8, 4]],
-                    [[-8, 8, 4], [0.0, 8, 4], [8, 8, 4], [-8, 0.0, 4], [0.0, 0.0, 4], [8, 0.0, 4], [-8, -8, 4], [0.0, -8, 4], [8, -8, 4],],
-                    [[32, 8, 4], [24, 8, 4], [16, 8, 4], [32, 0.0, 4], [24, 0.0, 4], [16, 0.0, 4], [32, -8, 4], [24, -8, 4], [16, -8, 4],],
-                    [[-32, -16, 4], [-24, -16, 4], [-16, -16, 4], [-32, -24, 4], [-24, -24, 4], [-16, -24, 4], [-32, -32, 4], [-24, -32, 4], [-16, -32, 4],],
-                    [[-8, -16, 4], [0.0, -16, 4], [8, -16, 4], [-8, -24, 4], [0.0, -24, 4], [8, -24, 4], [-8, -32, 4], [0.0, -32, 4], [8, -32, 4],],
+                    [[-16.0, 32.0, 4.0], [8.0, 24.0, 4.0], [24.0, 8.0, 4.0], [32.0, -16.0, 4.0], [16.0, -24.0, 4.0], [-4.0, -8.0, 4.0], [-8.0, 4.0, 4.0], [-28.0, 16.0, 4.0], [-32.0, 24.0, 4.0],], #open 
+                    [[-16.0, 32.0, 4.0], [8.0, 24.0, 4.0], [24.0, 8.0, 4.0], [32.0, -16.0, 4.0], [16.0, -24.0, 4.0], [-4.0, -8.0, 4.0], [-8.0, 4.0, 4.0], [-20.0, 16.0, 4.0], [-32.0, 24.0, 4.0],], #open corner 2 & 3
+                    [[-16.0, 32.0, 4.0], [8.0, 24.0, 4.0], [24.0, 8.0, 4.0], [32.0, -16.0, 4.0], [16.0, -24.0, 4.0], [4.0, -8.0, 4.0], [-8.0, 4.0, 4.0], [-20.0, 16.0, 4.0], [-32.0, 24.0, 4.0],], #open corner 2
                 ]
 
-    box_pos_tensor = []
-    for i in range(14):
-        index = np.random.randint(9)
-        box_pos_tensor.append(boxes_pos[int(i/2)][index])
+    # box_pos_tensor = []
+    # for i in range(14):
+    #     index = np.random.randint(9)
+    #     box_pos_tensor.append(boxes_pos[int(i/2)][index])
 
     #using float32 because env_origins of the scene will use float32
-    return torch.tensor(box_pos_tensor, dtype=torch.float32, device=env.device) #shape [num_cubes, 3]
+    return torch.tensor(boxes_pos[np.random.randint(3)], dtype=torch.float32, device=env.device) #shape [num_cubes, 3]
 
 def randomize_rigid_body_scale(
     env: ManagerBasedEnv,
