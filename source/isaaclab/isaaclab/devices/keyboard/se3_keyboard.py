@@ -171,8 +171,8 @@ class Se3Keyboard(DeviceBase):
             "W": np.asarray([1.0, 0.0, 0.0]) * self.pos_sensitivity,
             "S": np.asarray([-1.0, 0.0, 0.0]) * self.pos_sensitivity,
             # y-axis (left-right)
-            "A": np.asarray([0.0, 1.0, 0.0]) * self.pos_sensitivity,
-            "D": np.asarray([0.0, -1.0, 0.0]) * self.pos_sensitivity,
+            "A": np.asarray([0.0, 2.0, 0.0]) * self.pos_sensitivity,
+            "D": np.asarray([0.0, 1.0, 0.0]) * self.pos_sensitivity,
             # z-axis (up-down)
             "Q": np.asarray([0.0, 0.0, 1.0]) * self.pos_sensitivity,
             "E": np.asarray([0.0, 0.0, -1.0]) * self.pos_sensitivity,

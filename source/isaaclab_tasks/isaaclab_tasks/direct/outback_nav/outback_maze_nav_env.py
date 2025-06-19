@@ -89,8 +89,11 @@ class OutbackMazeNavEnv(DirectRLEnv):
 
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
-        # print(f"[INFO]:self._actions Shape: {self._actions.shape} self.cfg.action_scale: {self.cfg.action_scale}")
-        self._processed_actions = self._actions
+        # print(f"[INFO]:self._actions Shape: {self._actions.shape} self._actions: {self._actions}")
+        target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
+        target = torch.where(self._actions == 1.0, -0.5, target)
+        target = torch.where(self._actions == 2.0, 0.5, target)
+        self._processed_actions = target
         linear_speed = 2.0
         # print(f"[INFO]:_processed_actions: {self._processed_actions} shape: {self._processed_actions.shape}")
         out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
@@ -138,10 +141,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
         encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
         obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
 
-        reconstructed_image = self.autoencoder.decode(encoded_image)[0]
-        cv2.imshow("Original", sem_seg)
-        cv2.imshow("Reconstruction", reconstructed_image)
-        cv2.waitKey(1)
+        # reconstructed_image = self.autoencoder.decode(encoded_image)[0]
+        # cv2.imshow("Original", sem_seg)
+        # cv2.imshow("Reconstruction", reconstructed_image)
+        # cv2.waitKey(1)
         
         # img = cam_images[0].detach().cpu().numpy()
 

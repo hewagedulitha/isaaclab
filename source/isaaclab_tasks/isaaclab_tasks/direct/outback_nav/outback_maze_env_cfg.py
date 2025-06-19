@@ -665,10 +665,12 @@ class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
 
     # env
     episode_length_s = 80.0
-    decimation = 4
+    decimation = 8
     action_scale = 2.0
     #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
     action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
+    #dqn discrete action space
+    action_space = gym.spaces.Discrete(3)
     observation_space = gym.spaces.Box(
             low=-np.inf,
             high=np.inf,
@@ -679,7 +681,7 @@ class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
 
     # simulation
     sim: SimulationCfg = SimulationCfg(
-        dt=1 / 100,
+        dt=1 / 200,
         render_interval=decimation,
         physics_material=sim_utils.RigidBodyMaterialCfg(
             friction_combine_mode="multiply",
