@@ -50,7 +50,7 @@ import os
 import random
 from datetime import datetime
 
-from stable_baselines3 import PPO, SAC
+from stable_baselines3 import PPO, SAC, DQN
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.vec_env import VecNormalize
@@ -132,11 +132,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                 config={
                     "rl_library": "sb3",
                     "max_episode_length (seconds)": direct_env.max_episode_length_s,
-                    "algo": "SAC",
+                    "algo": "DQN",
                     "sim_dt": direct_env.cfg.sim.dt,
                     "decimation": direct_env.cfg.decimation,
                     "num_envs": direct_env.num_envs,
                     "starting_pos": "first_turn",
+                    "train_freq": agent_cfg["train_freq"],
                 },
                 sync_tensorboard=True,
             )
@@ -169,7 +170,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         )
 
     # create agent from stable baselines
-    agent = SAC(policy_arch, env, verbose=1, tensorboard_log=f"runs/{wandb_run.id}", **agent_cfg)
+    agent = DQN(policy_arch, env, verbose=1, tensorboard_log=f"runs/{wandb_run.id}", **agent_cfg)
     # configure the logger
     new_logger = configure(log_dir, ["stdout", "tensorboard"])
     agent.set_logger(new_logger)

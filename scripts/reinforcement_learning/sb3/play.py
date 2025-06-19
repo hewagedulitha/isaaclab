@@ -53,7 +53,7 @@ import time
 import torch
 import wandb
 
-from stable_baselines3 import PPO, SAC
+from stable_baselines3 import PPO, SAC, DQN
 from stable_baselines3.common.vec_env import VecNormalize
 
 from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent, DirectRLEnv
@@ -116,7 +116,7 @@ def main():
                 config={
                     "rl_library": "sb3",
                     "max_episode_length (seconds)": direct_env.max_episode_length_s,
-                    "algo": "SAC",
+                    "algo": "DQN",
                     "sim_dt": direct_env.cfg.sim.dt,
                     "decimation": direct_env.cfg.decimation,
                     "num_envs": direct_env.num_envs,
@@ -152,7 +152,7 @@ def main():
 
     # create agent from stable baselines
     print(f"Loading checkpoint from: {checkpoint_path}")
-    agent = SAC.load(checkpoint_path, env, print_system_info=True)
+    agent = DQN.load(checkpoint_path, env, print_system_info=True)
 
     dt = env.unwrapped.physics_dt
 
