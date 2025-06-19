@@ -1,0 +1,31 @@
+# Reference: https://github.com/DLR-RM/rl-baselines3-zoo/blob/feat/live-twitch/hyperparams/tqc.yml
+# Normalize AE (+ the rest)
+seed: 42
+
+# normalize: "{'norm_obs': True, 'norm_reward': False}"
+# env_wrapper:
+#   - gym.wrappers.time_limit.TimeLimit:
+#       max_episode_steps: 10000
+#   - ae.wrapper.AutoencoderWrapper
+#   - utils.wrappers.HistoryWrapper:
+#       horizon: 5
+# vec_env_wrapper:
+#   - utils.wrappers.VecForceResetWrapper
+n_timesteps: !!float 2e6
+policy: 'MlpPolicy'
+learning_rate: !!float 4e-4
+#learning_rate: !!float 3e-4
+buffer_size: 200000
+batch_size: 256
+# ent_coef: 'auto'
+gamma: 0.99
+target_update_interval: 600
+# tau: 0.02
+# train_freq: [1, "episode"]
+train_freq: 16
+# gradient_steps: -1
+gradient_steps: 256
+learning_starts: 1000
+exploration_fraction: 0.2
+exploration_final_eps: 0.07
+policy_kwargs: "dict(net_arch=[256, 256])"
