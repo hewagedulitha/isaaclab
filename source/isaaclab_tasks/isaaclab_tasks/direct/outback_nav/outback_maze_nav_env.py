@@ -233,9 +233,9 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         # print(f"[INFO]: force_matrices_L: {force_matrices_L.shape} force_matrices_R:{force_matrices_R.shape} force_matrices:{force_matrices.shape} flat_force_matrices:{flat_force_matrices.shape} max_force: {max_force.shape}")
         died = torch.any(flat_force_matrices != 0.0, dim=1)
-        if died or time_out:
-            print(f"[INFO]: self.episode_length_buf : {self.episode_length_buf}  self.max_episode_length :{ self.max_episode_length }")
-            print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
+        # if died or time_out:
+        #     print(f"[INFO]: self.episode_length_buf : {self.episode_length_buf}  self.max_episode_length :{ self.max_episode_length }")
+        #     print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")
         return died, time_out
 
     def _reset_idx(self, env_ids: torch.Tensor | None):

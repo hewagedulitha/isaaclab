@@ -668,7 +668,8 @@ class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
     decimation = 8
     action_scale = 2.0
     #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
-    action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
+    # action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
+    
     #dqn discrete action space
     action_space = gym.spaces.Discrete(3)
     observation_space = gym.spaces.Box(

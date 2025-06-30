@@ -1,6 +1,6 @@
 # Reference: https://github.com/DLR-RM/rl-baselines3-zoo/blob/feat/live-twitch/hyperparams/tqc.yml
 # Normalize AE (+ the rest)
-seed: 42
+seed: 128
 
 # normalize: "{'norm_obs': True, 'norm_reward': False}"
 # env_wrapper:
@@ -22,10 +22,10 @@ gamma: 0.99
 target_update_interval: 600
 # tau: 0.02
 # train_freq: [1, "episode"]
-train_freq: 16
+train_freq: 256
 # gradient_steps: -1
 gradient_steps: 256
-learning_starts: 1000
+learning_starts: 5000
 exploration_fraction: 0.2
 exploration_final_eps: 0.07
 policy_kwargs: "dict(net_arch=[256, 256])"
