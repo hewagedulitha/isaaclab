@@ -273,7 +273,7 @@ def main():
                 # Set the wandb entity where your project will be logged (generally your team name).
                 entity="hewaged-edith-cowan-university",
                 # Set the wandb project where this run will be logged.
-                project="outback-nav-demo",
+                project="outback-terrain-demo",
                 # Track hyperparameters and run metadata.
                 config={
                     "rl_library": "sb3",

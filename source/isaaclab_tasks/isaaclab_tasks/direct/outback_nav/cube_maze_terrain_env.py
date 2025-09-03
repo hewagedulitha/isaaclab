@@ -23,13 +23,12 @@ from isaacsim.robot.wheeled_robots.controllers.differential_controller import Di
 from ae.autoencoder import load_ae
 
 
-from .outback_maze_env_cfg import OutbackMazeNavEnvCfg
+from .cube_maze_terrain_env_cfg import CubeMazeTerrainEnvCfg
 
+class CubeMazeTerrainNavEnv(DirectRLEnv):
+    cfg: CubeMazeTerrainEnvCfg
 
-class OutbackMazeNavEnv(DirectRLEnv):
-    cfg: OutbackMazeNavEnvCfg
-
-    def __init__(self, cfg: OutbackMazeNavEnvCfg, render_mode: str | None = None, **kwargs):
+    def __init__(self, cfg: CubeMazeTerrainEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
 
         # Joint position command (deviation from default joint positions)
@@ -90,14 +89,10 @@ class OutbackMazeNavEnv(DirectRLEnv):
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self._actions: {self._actions}")
-
-        #DQN
         target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
         target = torch.where(self._actions == 1.0, -0.5, target)
         target = torch.where(self._actions == 2.0, 0.5, target)
         self._processed_actions = target
-
-        #SAC
         # self._processed_actions = self._actions
         linear_speed = 2.0
         # print(f"[INFO]:_processed_actions: {self._processed_actions} shape: {self._processed_actions.shape}")
@@ -137,12 +132,12 @@ class OutbackMazeNavEnv(DirectRLEnv):
         sem_seg = torch.squeeze(camera.data.output["semantic_segmentation"][..., :3].clone(), dim=0).cpu().detach().numpy()
         # print("Processed shape of sem_seg: ", sem_seg.shape)
         # print("Processed sem_seg: ", sem_seg)
-        # cwd = os.getcwd()
-        # print("Current directory: ",cwd)
-        # cv2.imshow("sem_seg_1.png", sem_seg)
+
+        # path = os.path.join("/home/hewaged/IsaacLab-Fork/dataset_terrain_nav/", f"sem_seg_{self.common_step_counter}.png")
+        # cv2.imwrite(path, sem_seg)
         # cv2.waitKey(1)
-        # save all camera RGB images
-        # cam_images = scene["camera"].data.output["rgb"][..., :3]
+        # print("Saving image to: ", path)
+
         encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
         obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
 
@@ -150,6 +145,8 @@ class OutbackMazeNavEnv(DirectRLEnv):
         # cv2.imshow("Original", sem_seg)
         # cv2.imshow("Reconstruction", reconstructed_image)
         # cv2.waitKey(1)
+
+        # logs/ae-32_1751950107.pkl
         
         # img = cam_images[0].detach().cpu().numpy()
 
@@ -179,7 +176,8 @@ class OutbackMazeNavEnv(DirectRLEnv):
         #clash error
         force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
         force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
-        force_matrices = torch.cat((force_matrices_L, force_matrices_R), dim=-1)
+        force_matrices_C = self.scene["contact_sensor_C"].data.force_matrix_w.clone()
+        force_matrices = torch.cat((force_matrices_L, force_matrices_R, force_matrices_C), dim=-1)
         flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
         # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         died = torch.any(flat_force_matrices != 0.0, dim=1)
@@ -190,7 +188,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
         #     clash_error = torch.tensor(1.0, dtype=torch.float, device=self.device)
         
         #goal
-        x_in_goal = torch.logical_and(20.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
+        x_in_goal = torch.logical_and(16.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
         y_in_goal =  torch.logical_and(-20.0 > body_pose[:, 1], body_pose[:, 1]  > -28.0)
         in_goal = torch.logical_and(x_in_goal, y_in_goal)
         goal_error = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
@@ -216,7 +214,7 @@ class OutbackMazeNavEnv(DirectRLEnv):
 
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # print(f"[INFO]: body_pose : {body_pose}")
-        x_in_goal = torch.logical_and(20.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
+        x_in_goal = torch.logical_and(16.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
         y_in_goal =  torch.logical_and(-20.0 > body_pose[:, 1], body_pose[:, 1]  > -28.0)
         in_goal = torch.logical_and(x_in_goal, y_in_goal)
         # print(f"[INFO]: in_goal : {in_goal}")
@@ -224,7 +222,8 @@ class OutbackMazeNavEnv(DirectRLEnv):
         time_out = torch.logical_or(time_out, in_goal)
         force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
         force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
-        force_matrices = torch.cat((force_matrices_L, force_matrices_R), dim=-1)
+        force_matrices_C = self.scene["contact_sensor_C"].data.force_matrix_w.clone()
+        force_matrices = torch.cat((force_matrices_L, force_matrices_R, force_matrices_C), dim=-1)
         # net_forces = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w, self.scene["contact_sensor_R"].data.net_forces_w), dim=-1)
         # net_forces_w_history = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w_history, self.scene["contact_sensor_R"].data.net_forces_w_history), dim=-1)
         # last_contact_time = torch.cat((self.scene["contact_sensor_L"].data.last_contact_time, self.scene["contact_sensor_R"].data.last_contact_time), dim=-1)

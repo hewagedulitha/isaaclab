@@ -41,64 +41,19 @@ from isaaclab_assets.robots.anymal import ANYMAL_C_CFG  # isort: skip
 from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
 
 filter_prim_path_expr = [
-        "{ENV_REGEX_NS}/outback/SM_Tree_L_01/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_02/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_01/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_02/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_Log_M_01_01/SM_Log_M_01",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_03/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_03/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_04/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_05/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_06/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_04/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_Log_M_01_02/SM_Log_M_01",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_05/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_07/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_08/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_06/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_Log_M_01_03/SM_Log_M_01",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_07/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_09/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_10/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_11/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_08/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_Log_M_01_05/SM_Log_M_01",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_09/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_Log_M_01_04/SM_Log_M_01",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_10/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_12/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_13/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_14/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05_15/SM_GrassTree_04",
-            "{ENV_REGEX_NS}/outback/SM_Tree_L_11/SM_Tree_L_01/Section0",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_02/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_Log_L_01/SM_Log_L_01",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_04/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_03/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_05/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_06/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_07/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_Log_L_03/SM_Log_L_01",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_08/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_09/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_10/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_Log_L_02/SM_Log_L_01",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_11/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_12/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_Log_L_04/SM_Log_L_01",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_13/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_14/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_15/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_16/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_17/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_18/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_19/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_20/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_21/SM_GrassTree_02/Section1",
-            "{ENV_REGEX_NS}/outback/SM_GrassTree_22/SM_GrassTree_02/Section1",
-    ] + ["{ENV_REGEX_NS}/outback/" + f"SM_GrassTree_05_{x}/SM_GrassTree_04" for x in range(16, 53) ] + ["{ENV_REGEX_NS}/outback/" + f"SM_GrassTree_0{x}/SM_GrassTree_02/Section0" for x in range(2, 10) ] + ["{ENV_REGEX_NS}/outback/" + f"SM_GrassTree_{x}/SM_GrassTree_02/Section0" for x in range(10, 23) ]
-
+        "{ENV_REGEX_NS}/outback/Cube_Group",
+        "{ENV_REGEX_NS}/outback/Cube_Group_01",
+        "{ENV_REGEX_NS}/outback/Cube_Group_02",
+        "{ENV_REGEX_NS}/outback/Cube_Group_03",
+        "{ENV_REGEX_NS}/outback/Cube_Group_04",
+        "{ENV_REGEX_NS}/outback/Cube_Group_05",
+        "{ENV_REGEX_NS}/outback/Cube_Group_06",
+        "{ENV_REGEX_NS}/outback/Cube_Group_07",
+        "{ENV_REGEX_NS}/outback/Cube_Group_08",
+        "{ENV_REGEX_NS}/outback/Cube_Group_01",
+        "{ENV_REGEX_NS}/outback/Cube_06",
+        "{ENV_REGEX_NS}/outback/Cube_19",
+    ]
 
 @configclass
 class EventCfg:
@@ -119,17 +74,17 @@ class EventCfg:
 ##
 
 @configclass
-class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
+class CubeMazeTerrainEnvSceneCfg(InteractiveSceneCfg):
     """Configuration for a multi-object scene."""
 
     # ground plane
     ground = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/outback", 
                           spawn=sim_utils.UsdFileCfg(
-                            usd_path="/home/hewaged/Documents/sac_nav_carter.usd",
+                            usd_path="/home/hewaged/Documents/cube_terrain_nav.usd",
                             ))
 
     robot = ArticulationCfg(
-        prim_path="{ENV_REGEX_NS}/carter_v1_2",
+        prim_path="{ENV_REGEX_NS}/carter_v1",
         spawn=sim_utils.UsdFileCfg(
             usd_path=f"{ISAAC_NUCLEUS_DIR}/Robots/Carter/carter_v1.usd",
             scale=(2.0, 2.0, 2.0),
@@ -151,8 +106,8 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
             activate_contact_sensors=True,
         ),
         init_state=ArticulationCfg.InitialStateCfg(
-                        pos=(-24.0, 24.0, 0.6), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
-            # pos=(24.0, -18.0, 2.0), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+                        # pos=(6.0, -8.0, 0.6), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+            pos=(6.0, -8.0, 0.1), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
         ),
         actuators={
             "all_joints": ImplicitActuatorCfg(
@@ -441,7 +396,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
 
     #Tiled Camera
     camera = TiledCameraCfg(
-        prim_path="{ENV_REGEX_NS}/carter_v1_2/chassis_link/front_cam",
+        prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link/front_cam",
         # update_period=0.1,
         height=480,
         width=640,
@@ -456,7 +411,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
 
     #LIDAR - name is important. Otherwise, the sensor will get initialized before the robot, resulting in an error.
     camera_lidar = LidarCfg(
-        prim_path="{ENV_REGEX_NS}/carter_v1_2/chassis_link/camera_mount/lidar",
+        prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link/camera_mount/lidar",
         # update_period=0.025,  # Update rate of 40Hz
         # data_types=["point_cloud"],  # Assuming the LiDAR generates point cloud data
         horizontal_fov=270.0,  # Horizontal field of view of 270 degrees
@@ -479,7 +434,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
     
     # contact sensors
     contact_sensor_L = ContactSensorCfg(
-        prim_path="{ENV_REGEX_NS}/carter_v1_2/left_wheel_link",
+        prim_path="{ENV_REGEX_NS}/carter_v1/left_wheel_link",
         update_period=0.0,
         history_length=6,
         debug_vis=False,
@@ -488,7 +443,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
     )
 
     contact_sensor_R = ContactSensorCfg(
-        prim_path="{ENV_REGEX_NS}/carter_v1_2/right_wheel_link",
+        prim_path="{ENV_REGEX_NS}/carter_v1/right_wheel_link",
         update_period=0.0,
         history_length=6,
         debug_vis=False,
@@ -496,7 +451,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
     )
 
     contact_sensor_C = ContactSensorCfg(
-        prim_path="{ENV_REGEX_NS}/carter_v1_2/chassis_link",
+        prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link",
         update_period=0.0,
         history_length=6,
         debug_vis=False,
@@ -506,12 +461,12 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
    
 
 @configclass
-class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
+class CubeMazeTerrainEnvCfg(DirectRLEnvCfg):
     # scene
-    scene: OutbackMazeEnvSceneCfg = OutbackMazeEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
+    scene: CubeMazeTerrainEnvSceneCfg = CubeMazeTerrainEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
 
     # change viewer settings
-    viewer = ViewerCfg(eye=(20.0, 20.0, 20.0), lookat=(-24.0, 24.0, 0.0))
+    viewer = ViewerCfg(eye=(20.0, 20.0, 20.0), lookat=(6.0, -8.0, 0.0))
 
     # events
     # events: EventCfg = EventCfg()

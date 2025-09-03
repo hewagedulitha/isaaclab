@@ -60,7 +60,7 @@ class EventCfg:
 ##
 
 @configclass
-class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
+class CubeMazeEnvSceneCfg(InteractiveSceneCfg):
     """Configuration for a multi-object scene."""
 
     # ground plane
@@ -567,7 +567,7 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
         # update_period=0.1,
         height=480,
         width=640,
-        data_types=["distance_to_image_plane", "semantic_segmentation"],
+        data_types=["distance_to_image_plane", "semantic_segmentation", "rgb"],
         colorize_semantic_segmentation=True,
         semantic_segmentation_mapping={"class:cube": (25, 255, 140, 255),},
         spawn=sim_utils.PinholeCameraCfg(
@@ -650,9 +650,9 @@ class OutbackMazeEnvSceneCfg(InteractiveSceneCfg):
     )
 
 @configclass
-class OutbackMazeNavEnvCfg(DirectRLEnvCfg):
+class CubeMazeNavEnvCfg(DirectRLEnvCfg):
     # scene
-    scene: OutbackMazeEnvSceneCfg = OutbackMazeEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
+    scene: CubeMazeEnvSceneCfg = CubeMazeEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
 
     # events
     events: EventCfg = EventCfg()
