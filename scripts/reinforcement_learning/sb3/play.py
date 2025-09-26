@@ -152,7 +152,7 @@ def main():
 
     # create agent from stable baselines
     print(f"Loading checkpoint from: {checkpoint_path}")
-    agent = DQN.load(checkpoint_path, env, print_system_info=True)
+    agent = SAC.load(checkpoint_path, env, print_system_info=True)
 
     dt = env.unwrapped.physics_dt
 

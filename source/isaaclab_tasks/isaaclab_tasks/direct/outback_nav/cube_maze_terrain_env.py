@@ -41,6 +41,7 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
         self._episode_sums = {
             key: torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
             for key in [
+                "terrain_reward",
                 "goal_reward",
                 "clash_reward",
                 "goal_distance_reward",
@@ -66,6 +67,7 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
         #     },
         # )
         self.autoencoder = load_ae(os.environ["AE_PATH"])
+        self.previous_terrain_reward = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
 
 
     def _setup_scene(self):
@@ -89,11 +91,11 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self._actions: {self._actions}")
-        target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
-        target = torch.where(self._actions == 1.0, -0.5, target)
-        target = torch.where(self._actions == 2.0, 0.5, target)
-        self._processed_actions = target
-        # self._processed_actions = self._actions
+        # target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
+        # target = torch.where(self._actions == 1.0, -0.5, target)
+        # target = torch.where(self._actions == 2.0, 0.5, target)
+        # self._processed_actions = target
+        self._processed_actions = self._actions
         linear_speed = 2.0
         # print(f"[INFO]:_processed_actions: {self._processed_actions} shape: {self._processed_actions.shape}")
         out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
@@ -133,18 +135,20 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
         # print("Processed shape of sem_seg: ", sem_seg.shape)
         # print("Processed sem_seg: ", sem_seg)
 
-        # path = os.path.join("/home/hewaged/IsaacLab-Fork/dataset_terrain_nav/", f"sem_seg_{self.common_step_counter}.png")
+        # path = os.path.join("/home/hewaged/IsaacLab-Fork/dataset_cube_maze_terrain/", f"sem_seg_{self.common_step_counter}.png")
         # cv2.imwrite(path, sem_seg)
         # cv2.waitKey(1)
         # print("Saving image to: ", path)
 
         encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
-        obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
+        rgb_obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
+        lidar_obs = lidar.data.output[:,:,0].clone()
+        obs = torch.cat((rgb_obs, lidar_obs), dim=1)
 
-        # reconstructed_image = self.autoencoder.decode(encoded_image)[0]
-        # cv2.imshow("Original", sem_seg)
-        # cv2.imshow("Reconstruction", reconstructed_image)
-        # cv2.waitKey(1)
+        reconstructed_image = self.autoencoder.decode(encoded_image)[0]
+        cv2.imshow("Original", sem_seg)
+        cv2.imshow("Reconstruction", reconstructed_image)
+        cv2.waitKey(1)
 
         # logs/ae-32_1751950107.pkl
         
@@ -167,18 +171,34 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # print(f"[INFO]: body_pose Shape: {body_pose.shape} RTX Lidar Output:{body_pose}")
 
-        goals = self.scene.env_origins.clone() + torch.tensor([24.0, -24.0, 0.0], dtype=torch.float, device=self.device)
+        goals = self.scene.env_origins.clone() + torch.tensor([6.0, -104.0, 0.0], dtype=torch.float, device=self.device)
 
         # distance error
         distance_to_the_goal = torch.sqrt((body_pose[:, 0]-goals[:, 0])**2 + (body_pose[:, 1]-goals[:, 1])**2)
-        distance_to_the_goal_error = torch.maximum(1 - distance_to_the_goal/67.22, torch.zeros(self.num_envs, dtype=torch.float, device=self.device))
+        # print(f"distance_to_the_goal: {distance_to_the_goal}")
+        distance_to_the_goal_error = torch.maximum(1 - distance_to_the_goal/96.0, torch.zeros(self.num_envs, dtype=torch.float, device=self.device))
 
         #clash error
         force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
         force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
         force_matrices_C = self.scene["contact_sensor_C"].data.force_matrix_w.clone()
         force_matrices = torch.cat((force_matrices_L, force_matrices_R, force_matrices_C), dim=-1)
-        flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
+        clash_force_matrices = force_matrices[:, :, :13, :]
+        terrain_force_matrices = force_matrices[:, :, 13:, :]
+        current_location = torch.any(terrain_force_matrices != 0.0, dim=3) #shape (1, 1, 7)
+        # print(f"[INFO]: current_location: {current_location} current_location.shape : {current_location.shape}")
+
+        terrain_rewards = torch.tensor([3.0, 1.0, 2.0, 3.0, 2.0, 1.0, 100.0], dtype=torch.float, device=self.device)
+        current_terrain = torch.squeeze(current_location, dim=1) #shape (1, 7)
+        
+        current_reward = terrain_rewards * current_terrain #shape (1, 7)
+        # print(f"[INFO]: current_terrain: {current_terrain.shape} current_reward.shape : {current_reward.shape}")
+        terrain_error= torch.sum(current_reward, 1) #shape (1,)
+        terrain_error[terrain_error == 0.0] = self.previous_terrain_reward #smooth out reward when reward is 0
+        self.previous_terrain_reward = terrain_error
+        # print(f"[INFO]: terrain_error: {terrain_error}")
+
+        flat_force_matrices = torch.flatten(clash_force_matrices, start_dim=1)
         # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         died = torch.any(flat_force_matrices != 0.0, dim=1)
         clash_error=torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
@@ -188,13 +208,14 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
         #     clash_error = torch.tensor(1.0, dtype=torch.float, device=self.device)
         
         #goal
-        x_in_goal = torch.logical_and(16.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
-        y_in_goal =  torch.logical_and(-20.0 > body_pose[:, 1], body_pose[:, 1]  > -28.0)
+        x_in_goal = torch.logical_and(0.0 < body_pose[:, 0], body_pose[:, 0]  < 12.0) 
+        y_in_goal =  torch.logical_and(-98.0 > body_pose[:, 1], body_pose[:, 1]  > -110.0)
         in_goal = torch.logical_and(x_in_goal, y_in_goal)
         goal_error = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
         goal_error[in_goal] = 1.0
 
         rewards = {
+            "terrain_reward": terrain_error,
             "goal_reward": goal_error * self.cfg.goal_reward_scale,
             "clash_reward": clash_error * self.cfg.clash_reward_scale,
             "goal_distance_reward": distance_to_the_goal_error * self.cfg.goal_distance_reward_scale,
@@ -214,8 +235,8 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
 
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # print(f"[INFO]: body_pose : {body_pose}")
-        x_in_goal = torch.logical_and(16.0 < body_pose[:, 0], body_pose[:, 0]  < 28.0) 
-        y_in_goal =  torch.logical_and(-20.0 > body_pose[:, 1], body_pose[:, 1]  > -28.0)
+        x_in_goal = torch.logical_and(0.0 < body_pose[:, 0], body_pose[:, 0]  < 12.0) 
+        y_in_goal =  torch.logical_and(-98.0 > body_pose[:, 1], body_pose[:, 1]  > -110.0)
         in_goal = torch.logical_and(x_in_goal, y_in_goal)
         # print(f"[INFO]: in_goal : {in_goal}")
 
@@ -224,11 +245,12 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
         force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
         force_matrices_C = self.scene["contact_sensor_C"].data.force_matrix_w.clone()
         force_matrices = torch.cat((force_matrices_L, force_matrices_R, force_matrices_C), dim=-1)
+        cube_force_matrices = force_matrices[:, :, :13, :]
         # net_forces = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w, self.scene["contact_sensor_R"].data.net_forces_w), dim=-1)
         # net_forces_w_history = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w_history, self.scene["contact_sensor_R"].data.net_forces_w_history), dim=-1)
         # last_contact_time = torch.cat((self.scene["contact_sensor_L"].data.last_contact_time, self.scene["contact_sensor_R"].data.last_contact_time), dim=-1)
         # current_contact_time = torch.cat((self.scene["contact_sensor_L"].data.current_contact_time, self.scene["contact_sensor_R"].data.current_contact_time), dim=-1)
-        flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
+        flat_force_matrices = torch.flatten(cube_force_matrices, start_dim=1)
         # print(f"[INFO]: flat_force_matrices: {flat_force_matrices}")
         # print(f"[INFO]: net_forces : {net_forces}")
         # print(f"[INFO]: net_forces_w_history : {net_forces_w_history}")
