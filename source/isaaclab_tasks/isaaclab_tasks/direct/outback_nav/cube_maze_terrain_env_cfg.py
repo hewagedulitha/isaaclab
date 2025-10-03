@@ -497,17 +497,17 @@ class CubeMazeTerrainEnvCfg(DirectRLEnvCfg):
     episode_length_s = 80.0
 
     #DQN
-    # decimation = 8
+    decimation = 8
 
     #SAC
-    decimation = 4
+    # decimation = 4
 
     action_scale = 2.0
     #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
-    action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
+    # action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
     
     #dqn discrete action space
-    # action_space = gym.spaces.Discrete(3)
+    action_space = gym.spaces.Discrete(3)
 
     observation_space = gym.spaces.Box(
             low=-np.inf,
@@ -519,7 +519,7 @@ class CubeMazeTerrainEnvCfg(DirectRLEnvCfg):
 
     # simulation
     sim: SimulationCfg = SimulationCfg(
-        dt=1 / 100, #DQN 1/200, SAC 1/100
+        dt=1 / 200, #DQN 1/200, SAC 1/100
         render_interval=decimation,
         physics_material=sim_utils.RigidBodyMaterialCfg(
             friction_combine_mode="multiply",

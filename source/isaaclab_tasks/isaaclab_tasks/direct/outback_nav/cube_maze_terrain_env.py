@@ -91,11 +91,11 @@ class CubeMazeTerrainNavEnv(DirectRLEnv):
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self._actions: {self._actions}")
-        # target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
-        # target = torch.where(self._actions == 1.0, -0.5, target)
-        # target = torch.where(self._actions == 2.0, 0.5, target)
-        # self._processed_actions = target
-        self._processed_actions = self._actions
+        target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
+        target = torch.where(self._actions == 1.0, -0.5, target)
+        target = torch.where(self._actions == 2.0, 0.5, target)
+        self._processed_actions = target
+        # self._processed_actions = self._actions
         linear_speed = 2.0
         # print(f"[INFO]:_processed_actions: {self._processed_actions} shape: {self._processed_actions.shape}")
         out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
