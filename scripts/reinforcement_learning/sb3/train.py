@@ -172,7 +172,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     # create agent from stable baselines
     # agent = SAC(policy_arch, env, verbose=1, tensorboard_log=f"runs/{wandb_run.id}", **agent_cfg)
-    agent = DQN(policy_arch, env, verbose=1, tensorboard_log=f"runs/{wandb_run.id}", **agent_cfg)
+    agent = SAC(policy_arch, env, verbose=1, tensorboard_log=f"runs/{wandb_run.id}", **agent_cfg)
     # configure the logger
     new_logger = configure(log_dir, ["stdout", "tensorboard"])
     agent.set_logger(new_logger)
