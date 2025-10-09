@@ -86,10 +86,12 @@ class CubeMazeTerrainEnvSceneCfg(InteractiveSceneCfg):
     """Configuration for a multi-object scene."""
 
     # ground plane
-    ground = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/outback", 
-                          spawn=sim_utils.UsdFileCfg(
-                            usd_path="/home/hewaged/Documents/cube_terrain_nav.usd",
-                            ))
+    ground = AssetBaseCfg(
+                            prim_path="{ENV_REGEX_NS}/outback", 
+                            spawn=sim_utils.UsdFileCfg(
+                                usd_path="/home/hewaged/Documents/cube_terrain_nav.usd",
+                            )
+            )
 
     robot = ArticulationCfg(
         prim_path="{ENV_REGEX_NS}/carter_v1",
