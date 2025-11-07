@@ -128,12 +128,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                 # Set the wandb entity where your project will be logged (generally your team name).
                 entity="hewaged-edith-cowan-university",
                 # Set the wandb project where this run will be logged.
-                project="sim2real-cube-nav",
+                project="outback-terrain-nav",
                 # Track hyperparameters and run metadata.
                 config={
                     "rl_library": "sb3",
                     "max_episode_length (seconds)": direct_env.max_episode_length_s,
-                    "algo": "DQN",
+                    "algo": "SAC",
                     "sim_dt": direct_env.cfg.sim.dt,
                     "decimation": direct_env.cfg.decimation,
                     "num_envs": direct_env.num_envs,
@@ -178,11 +178,11 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     agent.set_logger(new_logger)
 
     if args_cli.replay_buffer:
-        agent.load_replay_buffer(os.path.join("datasets", args_cli.replay_buffer))
+        agent.load_replay_buffer(args_cli.replay_buffer)
         print(f"The loaded_model has {agent.replay_buffer.size()} transitions in its buffer")
 
     # callbacks for agent
-    checkpoint_callback = CheckpointCallback(save_freq=1000, save_path=log_dir, name_prefix="model", verbose=2)
+    checkpoint_callback = CheckpointCallback(save_freq=10000, save_path=log_dir, name_prefix="model", verbose=2)
     # train the agent
     agent.learn(total_timesteps=n_timesteps, callback=[checkpoint_callback, WandbCallback()])
     # save the final model
@@ -190,7 +190,6 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     # close the simulator
     env.close()
-
 
 if __name__ == "__main__":
     # run the main function

@@ -23,12 +23,12 @@ from isaacsim.robot.wheeled_robots.controllers.differential_controller import Di
 from ae.autoencoder import load_ae
 
 
-from .sim2real_cube_env_cfg import Sim2RealCubeEnvCfg
+from .outback_terrain_env_cfg import OutbackTerrainEnvCfg
 
-class Sim2RealCubeEnv(DirectRLEnv):
-    cfg: Sim2RealCubeEnvCfg
+class OutbackTerrainEnv(DirectRLEnv):
+    cfg: OutbackTerrainEnvCfg
 
-    def __init__(self, cfg: Sim2RealCubeEnvCfg, render_mode: str | None = None, **kwargs):
+    def __init__(self, cfg: OutbackTerrainEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
 
         # Joint position command (deviation from default joint positions)
@@ -91,11 +91,11 @@ class Sim2RealCubeEnv(DirectRLEnv):
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self._actions: {self._actions}")
-        target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
-        target = torch.where(self._actions == 1.0, -0.5, target)
-        target = torch.where(self._actions == 2.0, 0.5, target)
-        self._processed_actions = target
-        # self._processed_actions = self._actions
+        # target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
+        # target = torch.where(self._actions == 1.0, -0.5, target)
+        # target = torch.where(self._actions == 2.0, 0.5, target)
+        # self._processed_actions = target
+        self._processed_actions = self._actions
         linear_speed = 2.0
         # print(f"[INFO]:_processed_actions: {self._processed_actions} shape: {self._processed_actions.shape}")
         out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
@@ -132,26 +132,22 @@ class Sim2RealCubeEnv(DirectRLEnv):
         # print("Received shape of distance_to_image_plane image: ", camera.data.output["distance_to_image_plane"].shape)
 
         sem_seg = torch.squeeze(camera.data.output["semantic_segmentation"][..., :3].clone(), dim=0).cpu().detach().numpy()
-        rgb = torch.squeeze(camera.data.output["rgb"][..., :3].clone(), dim=0).cpu().detach().numpy()
-        img_bgr = cv2.cvtColor(rgb, cv2.COLOR_BGR2RGB)
         # print("Processed shape of sem_seg: ", sem_seg.shape)
         # print("Processed sem_seg: ", sem_seg)
 
-        # path = os.path.join("/home/hewaged/IsaacLab-Fork/dataset_sim2real_cube/", f"rgb_{self.common_step_counter}.png")
-        # cv2.imwrite(path, img_bgr)
+        # path = os.path.join("/home/hewaged/IsaacLab-Fork/dataset_outback_terrain/", f"sem_seg_{self.common_step_counter}.png")
+        # cv2.imwrite(path, sem_seg)
         # cv2.waitKey(1)
         # print("Saving image to: ", path)
 
-        encoded_image = self.autoencoder.encode_from_raw_image(img_bgr)
+        encoded_image = self.autoencoder.encode_from_raw_image(sem_seg)
         rgb_obs = torch.unsqueeze(torch.tensor(encoded_image.flatten(), device=self.device, dtype=torch.float), 0)
         lidar_obs = lidar.data.output[:,:,0].clone()
-        # obs = torch.cat((rgb_obs, lidar_obs), dim=1)
-        obs = rgb_obs
+        obs = torch.cat((rgb_obs, lidar_obs), dim=1)
 
         reconstructed_image = self.autoencoder.decode(encoded_image)[0]
-        reconstructed_image_bgr = cv2.cvtColor(reconstructed_image, cv2.COLOR_BGR2RGB)
-        cv2.imshow("Original", img_bgr)
-        cv2.imshow("Reconstruction", reconstructed_image_bgr)
+        cv2.imshow("Original", sem_seg)
+        cv2.imshow("Reconstruction", reconstructed_image)
         cv2.waitKey(1)
 
         # logs/ae-32_1751950107.pkl
@@ -174,19 +170,22 @@ class Sim2RealCubeEnv(DirectRLEnv):
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # terrain_rewards = {
         #     "asphalt": 3.0,
-        #     "mud": 1.0,
+        #     "mud": -1.0,
         #     "dirt": 2.0, 
+        #     "grass": 1.0, 
         #     }
         
         # terrain_positions = {
-        #     "asphalt": [ [6.0, -76.0], [6.0, -12.0] ],
-        #     "mud": [ [-2.0, -60.0], [14.0, -28.0] ],
-        #     "dirt": [ [14.0, -60.0], [14.0, -44.0], [-2.0, -44.0], [-2.0, -28.0] ],
+        #     "asphalt": [ [49.0, 23.0], [57.0, 23.0], [49.0, 15.0], [57.0, 15.0] ],
+        #     "mud": [ [-7.0, 25.0], [1.0, 25.0], [25.0, 13.0], [33.0, 13.0] ],
+        #     "grass": [ [-15.0, 17.0], [-22.0, 17.0], [-15.0, 25.0], [-22.0, 25.0] ],
         # }
 
-        cube_pos = torch.tensor([[2.0, -48.0], [10.0, -48.0], [10.0, -16.0], [2.0, -16.0], [10.0, -8.0], [2.0, -8.0], 
-                                 [2.0, -40.0], [10.0, -24.0], 
-                                 [10.0, -40.0], [10.0, -32.0], [2.0, -32.0], [2.0, -24.0]], dtype=torch.float, device=self.device) #shape (num_cubes, 2)
+        cube_pos = torch.tensor([
+            [49.0, 23.0], [57.0, 23.0], [49.0, 15.0], [57.0, 15.0], #asphalt
+            [-7.0, 25.0], [1.0, 25.0], [25.0, 13.0], [33.0, 13.0], #mud
+            [-15.0, 17.0], [-22.0, 17.0], [-15.0, 25.0], [-22.0, 25.0], #grass
+                                 ], dtype=torch.float, device=self.device) #shape (num_cubes, 2)
 
         body_pose_x = torch.unsqueeze(body_pose[:, 0], -1).expand([self.num_envs, 12]) #shape (num_envs, num_cubes)
         body_pose_y = torch.unsqueeze(body_pose[:, 1], -1).expand([self.num_envs, 12]) #shape (num_envs, num_cubes)
@@ -204,27 +203,37 @@ class Sim2RealCubeEnv(DirectRLEnv):
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # print(f"[INFO]: body_pose Shape: {body_pose.shape} RTX Lidar Output:{body_pose}")
 
-        goals = self.scene.env_origins.clone() + torch.tensor([6.0, -12.0, 0.0], dtype=torch.float, device=self.device)
+        goals = self.scene.env_origins.clone() + torch.tensor([43.0, 20.0, 0.0], dtype=torch.float, device=self.device)
 
         # distance error
         distance_to_the_goal = torch.sqrt((body_pose[:, 0]-goals[:, 0])**2 + (body_pose[:, 1]-goals[:, 1])**2)
         # print(f"distance_to_the_goal: {distance_to_the_goal}")
-        distance_to_the_goal_error = torch.maximum(1 - distance_to_the_goal/64.0, torch.zeros(self.num_envs, dtype=torch.float, device=self.device))
+        distance_to_the_goal_error = torch.maximum(1 - distance_to_the_goal/54.0, torch.zeros(self.num_envs, dtype=torch.float, device=self.device))
+
+        #clash error
+        force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
+        force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
+        force_matrices_C = self.scene["contact_sensor_C"].data.force_matrix_w.clone()
+        force_matrices = torch.cat((force_matrices_L, force_matrices_R, force_matrices_C), dim=-1)
+        flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
+        # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
+        died = torch.any(flat_force_matrices != 0.0, dim=1)
+        clash_error=torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
+        clash_error[died] = 1.0
+        # if died:
+        #     #in_contact
+        #     clash_error = torch.tensor(1.0, dtype=torch.float, device=self.device)
 
         in_cube = self._calculate_current_cube()
-        
-        #clash reward
-        not_clash = torch.any(in_cube, dim=1)
-        clash_error=torch.ones(self.num_envs, dtype=torch.float, device=self.device)
-        clash_error[not_clash] = 0.0
-        #terrain reward
-        terrain_reward = torch.tensor([3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0], dtype=torch.float, device=self.device) #shape (8,)
+        terrain_reward = torch.tensor([0.3, 0.3, 0.3, 0.3, -0.1, -0.1, -0.1, -0.1, 0.1, 0.1, 0.1, 0.1], dtype=torch.float, device=self.device) #shape (8,)
         terrain_error= torch.sum(in_cube * terrain_reward, 1) #shape (num_envs,)
+        # set default reward for dirt terrain
+        terrain_error[terrain_error == 0.0] = 0.2 #shape (num_envs,)
         # print(f"[INFO]: terrain_error: {terrain_error}")
-        
-        #goal reward
-        x_in_goal = torch.logical_and(-2.0 < body_pose[:, 0], body_pose[:, 0]  < 14.0) 
-        y_in_goal =  torch.logical_and(-4.0 > body_pose[:, 1], body_pose[:, 1]  > -20.0)
+
+        #goal
+        x_in_goal = torch.logical_and(45.0 < body_pose[:, 0], body_pose[:, 0]  < 61.0) 
+        y_in_goal =  torch.logical_and(11.0 < body_pose[:, 1], body_pose[:, 1]  < 27.0)
         in_goal = torch.logical_and(x_in_goal, y_in_goal)
         goal_error = torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
         goal_error[in_goal] = 1.0
@@ -250,16 +259,30 @@ class Sim2RealCubeEnv(DirectRLEnv):
 
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
         # print(f"[INFO]: body_pose : {body_pose}")
-        x_in_goal = torch.logical_and(-2.0 < body_pose[:, 0], body_pose[:, 0]  < 14.0) 
-        y_in_goal =  torch.logical_and(-4.0 > body_pose[:, 1], body_pose[:, 1]  > -20.0)
+        x_in_goal = torch.logical_and(45.0 < body_pose[:, 0], body_pose[:, 0]  < 61.0) 
+        y_in_goal =  torch.logical_and(11.0 < body_pose[:, 1], body_pose[:, 1]  < 27.0)
         in_goal = torch.logical_and(x_in_goal, y_in_goal)
         # print(f"[INFO]: in_goal : {in_goal}")
 
         time_out = torch.logical_or(time_out, in_goal)
-        
-        #clash reward
-        in_cube = self._calculate_current_cube() #shape (num_envs, num_cubes)
-        died = torch.logical_not(torch.any(in_cube, dim=1)) #shape (num_envs, )
+
+        force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
+        force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
+        force_matrices_C = self.scene["contact_sensor_C"].data.force_matrix_w.clone()
+        force_matrices = torch.cat((force_matrices_L, force_matrices_R, force_matrices_C), dim=-1)
+        # net_forces = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w, self.scene["contact_sensor_R"].data.net_forces_w), dim=-1)
+        # net_forces_w_history = torch.cat((self.scene["contact_sensor_L"].data.net_forces_w_history, self.scene["contact_sensor_R"].data.net_forces_w_history), dim=-1)
+        # last_contact_time = torch.cat((self.scene["contact_sensor_L"].data.last_contact_time, self.scene["contact_sensor_R"].data.last_contact_time), dim=-1)
+        # current_contact_time = torch.cat((self.scene["contact_sensor_L"].data.current_contact_time, self.scene["contact_sensor_R"].data.current_contact_time), dim=-1)
+        flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
+        # print(f"[INFO]: flat_force_matrices: {flat_force_matrices}")
+        # print(f"[INFO]: net_forces : {net_forces}")
+        # print(f"[INFO]: net_forces_w_history : {net_forces_w_history}")
+        # print("[INFO]: last_contact_time: ", self.scene["contact_sensor_L"].data.last_contact_time)
+        # print(f"[INFO]: current_contact_time : {current_contact_time}")
+        # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
+        # print(f"[INFO]: force_matrices_L: {force_matrices_L.shape} force_matrices_R:{force_matrices_R.shape} force_matrices:{force_matrices.shape} flat_force_matrices:{flat_force_matrices.shape} max_force: {max_force.shape}")
+        died = torch.any(flat_force_matrices != 0.0, dim=1)
         # if died or time_out:
         #     print(f"[INFO]: self.episode_length_buf : {self.episode_length_buf}  self.max_episode_length :{ self.max_episode_length }")
         #     print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")

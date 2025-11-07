@@ -401,7 +401,7 @@ def main():
                         replay_buffer.add(d["obs"], d["next_obs"], d["action"], d["reward"], d["done"], d["infos"])
                         duplicate_count += 1
 
-                save_replay_buffer(replay_buffer, f'datasets/cube_maze_terrain_sac_replay_buffer_{transition_counter}.pkl')
+                save_replay_buffer(replay_buffer, f'datasets/outback_terrain_nav_sac_replay_buffer_{transition_counter}.pkl')
                 # with open(f'datasets/result_{transition_counter}.json', 'w') as fp:
                 #     json.dump(state_dicts, fp)
                 should_reset_recording_instance = False

@@ -40,28 +40,81 @@ from isaaclab.sensors.ray_caster import RayCasterCfg, patterns
 from isaaclab_assets.robots.anymal import ANYMAL_C_CFG  # isort: skip
 from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
 
-# filter_prim_path_expr = [
-#         "{ENV_REGEX_NS}/outback/Cube_Group",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_01",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_02",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_03",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_04",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_05",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_06",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_07",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_08",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_09",
-#         "{ENV_REGEX_NS}/outback/Cube_Group_10",
-#         "{ENV_REGEX_NS}/outback/Cube_06",
-#         "{ENV_REGEX_NS}/outback/Cube_19",
-#         "{ENV_REGEX_NS}/outback/Terrain_Cube",
-#         "{ENV_REGEX_NS}/outback/Terrain_Cube_01",
-#         "{ENV_REGEX_NS}/outback/Terrain_Cube_02",
-#         "{ENV_REGEX_NS}/outback/Terrain_Cube_03",
-#         "{ENV_REGEX_NS}/outback/Terrain_Cube_04",
-#         "{ENV_REGEX_NS}/outback/Terrain_Cube_05",
-#         "{ENV_REGEX_NS}/outback/Terrain_Cube_06",
-#     ]
+filter_prim_path_expr = [
+        "{ENV_REGEX_NS}/outback/SM_Tree_L_01/SM_Tree_L_01/Section0",
+        "{ENV_REGEX_NS}/outback/SM_Tree_L_02/SM_Tree_L_01/Section0",
+        "{ENV_REGEX_NS}/outback/SM_Tree_L_03/SM_Tree_L_01/Section0",
+        "{ENV_REGEX_NS}/outback/SM_Log_M_01_01/SM_Log_M_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_M_01_02/SM_Log_M_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_M_01_03/SM_Log_M_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_L_01/SM_Log_L_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_L_02/SM_Log_L_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_L_03/SM_Log_L_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_L_04/SM_Log_L_01",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_02/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_02/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_03/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_03/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_04/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_04/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_06/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_06/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_07/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_07/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_08/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_08/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_16/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_16/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_20/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_20/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_17/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_17/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_21/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_21/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_18/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_18/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_22/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_22/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_19/SM_GrassTree_02/Section1",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_19/SM_GrassTree_02/Section0",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_02/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_01/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_03/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_04/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_05/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_06/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_07/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_08/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_09/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_27/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_28/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_29/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_30/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_31/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_32/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_33/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_34/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_35/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_36/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_37/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_38/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_39/SM_GrassTree_04",
+        # "{ENV_REGEX_NS}/outback/SM_GrassTree_05_40/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_41/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_42/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_43/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_44/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_45/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_46/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_47/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_48/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_51/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_52/SM_GrassTree_04",
+        "{ENV_REGEX_NS}/outback/SM_GrassTree_05_50/SM_GrassTree_04",
+
+    ]
 
 @configclass
 class EventCfg:
@@ -82,14 +135,14 @@ class EventCfg:
 ##
 
 @configclass
-class Sim2RealCubeEnvSceneCfg(InteractiveSceneCfg):
+class OutbackTerrainEnvSceneCfg(InteractiveSceneCfg):
     """Configuration for a multi-object scene."""
 
     # ground plane
     ground = AssetBaseCfg(
                             prim_path="{ENV_REGEX_NS}/outback", 
                             spawn=sim_utils.UsdFileCfg(
-                                usd_path="/home/hewaged/Documents/sim2real_cube_terrain_nav_pink_yellow_blue.usd",
+                                usd_path="/home/hewaged/Documents/outback_terrain_nav.usd",
                             )
             )
 
@@ -116,8 +169,8 @@ class Sim2RealCubeEnvSceneCfg(InteractiveSceneCfg):
             activate_contact_sensors=True,
         ),
         init_state=ArticulationCfg.InitialStateCfg(
-                        # pos=(6.0, -8.0, 0.6), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
-            pos=(6.0, -48.0, 0.4), rot=(0.70711, 0.0, 0.0, 0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+                        pos=(-24.0, 20.0, 0.4), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+            # pos=(-24.0, 24.0, 0.4), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
         ),
         actuators={
             "all_joints": ImplicitActuatorCfg(
@@ -136,7 +189,7 @@ class Sim2RealCubeEnvSceneCfg(InteractiveSceneCfg):
         # update_period=0.1,
         height=480,
         width=640,
-        data_types=["rgb", "semantic_segmentation"],
+        data_types=["distance_to_image_plane", "semantic_segmentation"],
         colorize_semantic_segmentation=True,
         semantic_segmentation_mapping={
             "class:obstacle": (55, 8, 209, 255),
@@ -148,7 +201,7 @@ class Sim2RealCubeEnvSceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.PinholeCameraCfg(
             focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 1.0e5)
         ),
-        # offset=TiledCameraCfg.OffsetCfg(pos=(0.510, 0.0, 1.2), rot=(0.59017, 0.38949, -0.38949, -0.59017), convention="opengl"),
+        # offset=TiledCameraCfg.OffsetCfg(pos=(0.510, 0.0, 0.86), rot=(0.57206, 0.41563, -0.41563, -0.57206), convention="opengl"),
         offset=TiledCameraCfg.OffsetCfg(pos=(0.510, 0.0, 0.86), rot=(0.57206, 0.41563, -0.41563, -0.57206), convention="opengl"),
     )
 
@@ -178,40 +231,40 @@ class Sim2RealCubeEnvSceneCfg(InteractiveSceneCfg):
     )
     
     # contact sensors
-    # contact_sensor_L = ContactSensorCfg(
-    #     prim_path="{ENV_REGEX_NS}/carter_v1/left_wheel_link",
-    #     update_period=0.0,
-    #     history_length=6,
-    #     debug_vis=False,
-    #     filter_prim_paths_expr=filter_prim_path_expr,            
+    contact_sensor_L = ContactSensorCfg(
+        prim_path="{ENV_REGEX_NS}/carter_v1/left_wheel_link",
+        update_period=0.0,
+        history_length=6,
+        debug_vis=False,
+        filter_prim_paths_expr=filter_prim_path_expr,            
 
-    # )
+    )
 
-    # contact_sensor_R = ContactSensorCfg(
-    #     prim_path="{ENV_REGEX_NS}/carter_v1/right_wheel_link",
-    #     update_period=0.0,
-    #     history_length=6,
-    #     debug_vis=False,
-    #     filter_prim_paths_expr=filter_prim_path_expr,
-    # )
+    contact_sensor_R = ContactSensorCfg(
+        prim_path="{ENV_REGEX_NS}/carter_v1/right_wheel_link",
+        update_period=0.0,
+        history_length=6,
+        debug_vis=False,
+        filter_prim_paths_expr=filter_prim_path_expr,
+    )
 
-    # contact_sensor_C = ContactSensorCfg(
-    #     prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link",
-    #     update_period=0.0,
-    #     history_length=6,
-    #     debug_vis=False,
-    #     filter_prim_paths_expr=filter_prim_path_expr,
-    # )
+    contact_sensor_C = ContactSensorCfg(
+        prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link",
+        update_period=0.0,
+        history_length=6,
+        debug_vis=False,
+        filter_prim_paths_expr=filter_prim_path_expr,
+    )
 
    
 
 @configclass
-class Sim2RealCubeEnvCfg(DirectRLEnvCfg):
+class OutbackTerrainEnvCfg(DirectRLEnvCfg):
     # scene
-    scene: Sim2RealCubeEnvSceneCfg = Sim2RealCubeEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
+    scene: OutbackTerrainEnvSceneCfg = OutbackTerrainEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
 
     # change viewer settings
-    viewer = ViewerCfg(eye=(20.0, 20.0, 20.0), lookat=(6.0, -8.0, 0.0))
+    viewer = ViewerCfg(eye=(20.0, 20.0, 20.0), lookat=(-24.0, 24.0, 0.0), resolution=(640, 480))
 
     # events
     # events: EventCfg = EventCfg()
@@ -241,7 +294,7 @@ class Sim2RealCubeEnvCfg(DirectRLEnvCfg):
     observation_space = gym.spaces.Box(
             low=-np.inf,
             high=np.inf,
-            shape=(32,), #encoded RGB data + lidar points
+            shape=(32 + 20,), #encoded RGB data + lidar points
             dtype=np.float32,
         )  # or for simplicity: [height, width, 3]
     state_space = 0
@@ -261,5 +314,5 @@ class Sim2RealCubeEnvCfg(DirectRLEnvCfg):
 
     # reward scales
     goal_reward_scale = 2000.0
-    clash_reward_scale = -10000.0
+    clash_reward_scale = -1000.0
     goal_distance_reward_scale = 1.0
