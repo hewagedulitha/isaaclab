@@ -121,6 +121,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
     
+    algo = "SAC"
 
     if isinstance(env.unwrapped, DirectRLEnv):
         direct_env: DirectRLEnv = env.unwrapped
@@ -128,8 +129,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                 # Set the wandb entity where your project will be logged (generally your team name).
                 entity="hewaged-edith-cowan-university",
                 # Set the wandb project where this run will be logged.
-                project="outback-terrain-nav",
+                project="cube-terrain-nav",
                 # Track hyperparameters and run metadata.
+                name="cube-terrain-" + algo + "-" + str(agent_cfg["seed"]) + ("-with-replay" if args_cli.replay_buffer else ""), 
                 config={
                     "rl_library": "sb3",
                     "max_episode_length (seconds)": direct_env.max_episode_length_s,
@@ -139,6 +141,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                     "num_envs": direct_env.num_envs,
                     "seed": agent_cfg["seed"],
                     "train_freq": agent_cfg["train_freq"],
+                    "replay_buffer": args_cli.replay_buffer,
                 },
                 sync_tensorboard=True,
             )

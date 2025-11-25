@@ -47,6 +47,9 @@ filter_prim_path_expr = [
         "{ENV_REGEX_NS}/outback/SM_Log_M_01_01/SM_Log_M_01",
         "{ENV_REGEX_NS}/outback/SM_Log_M_01_02/SM_Log_M_01",
         "{ENV_REGEX_NS}/outback/SM_Log_M_01_03/SM_Log_M_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_M_01_04/SM_Log_M_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_M_01_05/SM_Log_M_01",
+        "{ENV_REGEX_NS}/outback/SM_Log_M_01_06/SM_Log_M_01",
         "{ENV_REGEX_NS}/outback/SM_Log_L_01/SM_Log_L_01",
         "{ENV_REGEX_NS}/outback/SM_Log_L_02/SM_Log_L_01",
         "{ENV_REGEX_NS}/outback/SM_Log_L_03/SM_Log_L_01",
@@ -264,7 +267,7 @@ class OutbackTerrainEnvCfg(DirectRLEnvCfg):
     scene: OutbackTerrainEnvSceneCfg = OutbackTerrainEnvSceneCfg(num_envs=1, env_spacing=72.0, replicate_physics=False)
 
     # change viewer settings
-    viewer = ViewerCfg(eye=(20.0, 20.0, 20.0), lookat=(-24.0, 24.0, 0.0), resolution=(640, 480))
+    viewer = ViewerCfg(cam_prim_path="/World/envs/env_0/carter_v1/chassis_link/front_cam", resolution=(640, 480))
 
     # events
     # events: EventCfg = EventCfg()
