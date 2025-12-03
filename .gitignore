@@ -60,3 +60,18 @@ _build
 
 # Pre-Trained Checkpoints
 /.pretrained_checkpoints/
+datasets/cube_maze_terrain_replay_buffer_1250.pkl
+datasets/cube_maze_terrain_sac_replay_buffer_25.pkl
+datasets/cube_maze_terrain_sac_replay_buffer_125.pkl
+datasets/cube_maze_terrain_sac_replay_buffer_566.pkl
+datasets/cube_maze_terrain_sac_replay_buffer_587.pkl
+datasets/cube_maze_terrain_sac_replay_buffer_679.pkl
+datasets/cube_maze_terrain_sac_replay_buffer_1230.pkl
+datasets/cube_maze_terrain_sac_replay_buffer_4132.pkl
+datasets/outback_terrain_nav_sac_replay_buffer_862.pkl
+datasets/outback_terrain_nav_sac_replay_buffer_1198.pkl
+datasets/replay_buffer_1170.pkl
+datasets/replay_buffer_1301.pkl
+datasets/replay_buffer_1641.pkl
+datasets/cube_maze/replay_buffer_1340.pkl
+datasets/cube_maze/replay_buffer_12000.pkl
