@@ -180,6 +180,144 @@ class OutbackTerrainEnv(DirectRLEnv):
         #     "mud": [ [-7.0, 25.0], [1.0, 25.0], [25.0, 13.0], [33.0, 13.0] ],
         #     "grass": [ [-15.0, 17.0], [-22.0, 17.0], [-15.0, 25.0], [-22.0, 25.0] ],
         # }
+        OFFSET = 152.0
+        yellow_cube_pos_x = [
+            [-147.5, -144.5], # left, 1
+            [-147.5, -144.5], # left, 2
+            [-147.5, -144.5], # left, 3
+            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 1
+            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 2
+            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 3
+            [-142.0, -106.0], # bottom, 1
+            [-82.0, -58.5], # bottom, 2
+            [-34.0, -2.0], # bottom, 3
+            [-142.0, -106.0], # top, 1
+            [-82.0, -58.5], # top, 2
+            [-34.0, -2.0], # top, 3
+        ]
+
+        yellow_cube_pos_y = [
+            [-128.0, -92.0], #left 1
+            [-67.5, -44.0], #left 2
+            [-20.0, 16.0], #left 3
+            [-128.0, -92.0], #right 1
+            [-67.5, -44.0], #right 2
+            [-20.0, 16.0], #right 3
+            [-133.5, -130.5], #bottom 1
+            [-133.5, -130.5], #bottom 2
+            [-133.5, -130.5], #bottom 3
+            [-133.5 + OFFSET, -130.5 + OFFSET], #top 1
+            [-133.5 + OFFSET, -130.5 + OFFSET], #top 2
+            [-133.5 + OFFSET, -130.5 + OFFSET], #top 3
+        ]
+
+        blue_cube_pos_x = [
+            [-155.5, -152.5], #left long 1
+            [-151.5, -146.5], #left short 1
+            [-151.5, -146.5], #left short 2
+            [-139.5, -136.5], #left long 2
+            [-145.5, -140.5], #left short 3
+            [-145.5, -140.5], #left short 4
+            [-155.5 + OFFSET, -152.5 + OFFSET], #right long 1
+            [-152.5 + OFFSET, -146.5 + OFFSET], #right short 1
+            [-152.5 + OFFSET, -146.5 + OFFSET], #right short 2
+            [-139.5 + OFFSET, -136.5 + OFFSET], #right long 2
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 3
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 4
+            [-105.5, -82.5], #bottom long 1
+            [-105.5, -102.5], #bottom short 1
+            [-85.5, -82.5], #bottom short 2
+            [-57.5, -34.5], #bottom long 2
+            [-57.5, -54.5], #bottom short 3
+            [-37.5, -34.5], #bottom short 4
+            [-105.5, -82.5], #top long 1
+            [-105.5, -102.5], #top short 1
+            [-85.5, -82.5], #top short 2
+            [-57.5, -34.5], #top long 2
+            [-57.5, -54.5], #top short 3
+            [-37.5, -34.5], #top short 4
+        ]
+
+        blue_cube_pos_y = [
+            [-91.5, -68.5], #left long 1
+            [-91.5, -88.5], #left short 1
+            [-71.5, -68.5], #left short 2
+            [-43.5, -20.5], #left long 2
+            [-43.5, -40.5], #left short 3
+            [-23.5, -20.5], #left short 4
+            [-91.5, -68.5], #right long 1
+            [-91.5, -88.5], #right short 1
+            [-71.5, -68.5], #right short 2
+            [-43.5, -20.5], #right long 2
+            [-43.5, -40.5], #right short 3
+            [-23.5, -20.5], #right short 4
+            [-125.5, -122.5], #bottom long 1
+            [-126.5, -131.5], #bottom short 1
+            [-126.5, -131.5], #bottom short 2
+            [-141.5, -138.5], #bottom long 2
+            [-132.5, -137.5], #bottom short 3
+            [-132.5, -137.5], #bottom short 4
+            [-125.5 + OFFSET, -122.5 + OFFSET], #top long 1
+            [-126.5 + OFFSET, -131.5 + OFFSET], #top short 1
+            [-126.5 + OFFSET, -131.5 + OFFSET], #top short 2
+            [-141.5 + OFFSET, -138.5 + OFFSET], #top long 2
+            [-132.5 + OFFSET, -137.5 + OFFSET], #top short 3
+            [-132.5 + OFFSET, -137.5 + OFFSET], #top short 4
+        ]
+
+        red_cube_pos_x = [
+            [-139.5, -136.5], #left long 1
+            [-145.5, -140.5], #left short 1
+            [-145.5, -140.5], #left short 2
+            [-155.5, -152.5], #left long 2
+            [-151.5, -146.5], #left short 3
+            [-151.5, -146.5], #left short 4
+            [-139.5 + OFFSET, -136.5 + OFFSET], #right long 1
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 1
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 2
+            [-155.5 + OFFSET, -152.5 + OFFSET], #right long 2
+            [-151.5 + OFFSET, -146.5 + OFFSET], #right short 3
+            [-151.5 + OFFSET, -146.5 + OFFSET], #right short 4
+            [-105.5, -82.5], #bottom long 1
+            [-105.5, -102.5], #bottom short 1
+            [-85.5, -82.5], #bottom short 2
+            [-57.5, -34.5], #bottom long 2
+            [-57.5, -54.5], #bottom short 3
+            [-37.5, -34.5], #bottom short 4
+            [-105.5, -82.5], #top long 1
+            [-105.5, -102.5], #top short 1
+            [-85.5, -82.5], #top short 2
+            [-57.5, -34.5], #top long 2
+            [-57.5, -54.5], #top short 3
+            [-37.5, -34.5], #top short 4
+        ]
+
+        red_cube_pos_y = [
+            [-91.5, -68.5], #left long 1
+            [-91.5, -88.5], #left short 1
+            [-71.5, -68.5], #left short 2
+            [-43.5, -20.5], #left long 2
+            [-23.5, -20.5], #left short 3
+            [-43.5, -40.5], #left short 4
+            [-91.5, -68.5], #right long 1
+            [-91.5, -88.5], #right short 1
+            [-71.5, -68.5], #right short 2
+            [-43.5, -20.5], #right long 2
+            [-23.5, -20.5], #right short 3
+            [-43.5, -40.5], #right short 4
+            [-141.5, -138.5], #bottom long 1
+            [-137.5, -132.5], #bottom short 1
+            [-137.5, -132.5], #bottom short 2
+            [-125.5, -122.5], #bottom long 2
+            [-126.5, -131.5], #bottom short 3
+            [-126.5, -131.5], #bottom short 4
+            [-141.5 + OFFSET, -138.5 + OFFSET], #top long 1
+            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 1
+            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 2
+            [-125.5 + OFFSET, -122.5 + OFFSET], #top long 2
+            [-126.5 + OFFSET, -131.5 + OFFSET], #top short 3
+            [-126.5 + OFFSET, -131.5 + OFFSET], #top short 4
+        ]
 
         cube_pos = torch.tensor([
             [49.0, 23.0], [57.0, 23.0], [49.0, 15.0], [57.0, 15.0], #asphalt
@@ -196,7 +334,7 @@ class OutbackTerrainEnv(DirectRLEnv):
         y_in_cube =  torch.logical_and(cube_pos[:, :, 1] + 4.0 > body_pose_y, body_pose_y  > cube_pos[:, :, 1] - 4.0) #shape (num_envs, num_cubes)
         in_cube = torch.logical_and(x_in_cube, y_in_cube) #shape (num_envs, num_cubes)
 
-        return in_cube
+        return in_cube # (num_envs, num_terrain)
 
     def _get_rewards(self) -> torch.Tensor:
 

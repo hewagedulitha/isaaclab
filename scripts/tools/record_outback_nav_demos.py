@@ -344,10 +344,14 @@ def main():
             # perform action on environment
             prev_obs = obs
             obs, rew, terminated, truncated, extras = env.step(actions)
-            target = torch.zeros((env.num_envs, 1), dtype=torch.float32, device=env.device)
-            target = torch.where(actions == 1.0, -0.5, target)
-            target = torch.where(actions == 2.0, 0.5, target)
-            actions = target.detach().cpu().numpy()
+            #SAC
+            # target = torch.zeros((env.num_envs, 1), dtype=torch.float32, device=env.device)
+            # target = torch.where(actions == 1.0, -0.5, target)
+            # target = torch.where(actions == 2.0, 0.5, target)
+            # actions = target.detach().cpu().numpy()
+
+            #DQN
+            actions = actions.detach().cpu().numpy()
             # print(f"[INFO] actions: {actions} shape: {actions.shape}")
             dones = terminated | truncated
             reset_ids = (dones > 0).nonzero(as_tuple=False)
@@ -401,7 +405,8 @@ def main():
                         replay_buffer.add(d["obs"], d["next_obs"], d["action"], d["reward"], d["done"], d["infos"])
                         duplicate_count += 1
 
-                save_replay_buffer(replay_buffer, f'datasets/outback_terrain_nav_sac_replay_buffer_{transition_counter}.pkl')
+                # save_replay_buffer(replay_buffer, f'datasets/outback_terrain_nav_dqn_replay_buffer_{transition_counter}.pkl')
+                save_replay_buffer(replay_buffer, f'datasets/cube_terrain_nav_dqn_replay_buffer_{transition_counter}.pkl')
                 # with open(f'datasets/result_{transition_counter}.json', 'w') as fp:
                 #     json.dump(state_dicts, fp)
                 should_reset_recording_instance = False

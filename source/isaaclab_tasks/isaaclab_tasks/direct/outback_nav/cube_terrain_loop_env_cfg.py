@@ -145,7 +145,7 @@ class OutbackTerrainEnvSceneCfg(InteractiveSceneCfg):
     ground = AssetBaseCfg(
                             prim_path="{ENV_REGEX_NS}/outback", 
                             spawn=sim_utils.UsdFileCfg(
-                                usd_path="/home/hewaged/Documents/outback_terrain_nav.usd",
+                                usd_path="/home/hewaged/Documents/cube_terrain_loop_nav.usd",
                             )
             )
 
