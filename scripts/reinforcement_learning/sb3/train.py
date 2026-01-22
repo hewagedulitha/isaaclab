@@ -129,9 +129,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                 # Set the wandb entity where your project will be logged (generally your team name).
                 entity="hewaged-edith-cowan-university",
                 # Set the wandb project where this run will be logged.
-                project="cube-terrain-nav",
+                project="cube-terrain-loop-nav",
                 # Track hyperparameters and run metadata.
-                name="cube-terrain-" + algo + "-" + str(agent_cfg["seed"]) + ("-with-replay" if args_cli.replay_buffer else ""), 
+                name="cube-terrain-loop-" + algo + "-" + str(agent_cfg["seed"]) + ("-with-replay" if args_cli.replay_buffer else ""), 
                 config={
                     "rl_library": "sb3",
                     "max_episode_length (seconds)": direct_env.max_episode_length_s,
