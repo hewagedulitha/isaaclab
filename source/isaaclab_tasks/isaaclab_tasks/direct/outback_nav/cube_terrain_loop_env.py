@@ -43,7 +43,7 @@ class CubeTerrainLoopEnv(DirectRLEnv):
             for key in [
                 "terrain_reward",
                 # "goal_reward",
-                "clash_reward",
+                # "clash_reward",
                 # "goal_distance_reward",
             ]
         }
@@ -91,12 +91,12 @@ class CubeTerrainLoopEnv(DirectRLEnv):
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self._actions: {self._actions}")
-        # target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
-        # target = torch.where(self._actions == 1.0, -0.5, target)
-        # target = torch.where(self._actions == 2.0, 0.5, target)
-        # self._processed_actions = target
-        self._processed_actions = self._actions
-        linear_speed = 0.4
+        target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
+        target = torch.where(self._actions == 1.0, -0.5, target)
+        target = torch.where(self._actions == 2.0, 0.5, target)
+        self._processed_actions = target
+        # self._processed_actions = self._actions
+        linear_speed = 0.8
         # print(f"[INFO]:_processed_actions: {self._processed_actions} shape: {self._processed_actions.shape}")
         out = torch.cat([linear_speed * torch.ones((self.num_envs, 1), device=self.device), self._processed_actions], 1)
         joint_vel_targets = torch.stack([self.get_joint_vel_targets(i) for i in out ])
@@ -168,6 +168,9 @@ class CubeTerrainLoopEnv(DirectRLEnv):
     
     def _check_current_cube(self, cube_pose_x: torch.Tensor, cube_pose_y: torch.Tensor) -> torch.Tensor:
         body_pose = self.scene["robot"].data.body_pos_w.clone()[:, 0]
+        origins_x = self.scene.env_origins[:, None, None, 0] #shape (num_envs, 1, 1)
+        origins_y = self.scene.env_origins[:, None, None, 1] #shape (num_envs, 1, 1)
+        # print(f"[INFO]: self.scene.env_origins: {self.scene.env_origins}")
         # print("[INFO]: body_pose: ", body_pose)          
         num_cubes = cube_pose_x.shape[0]
 
@@ -176,7 +179,9 @@ class CubeTerrainLoopEnv(DirectRLEnv):
         cube_pose_x = torch.unsqueeze(cube_pose_x, 0) #shape (1, num_cubes, 2)
         cube_pose_y = torch.unsqueeze(cube_pose_y, 0) #shape (1, num_cubes, 2)
         cube_pose_x = cube_pose_x.expand([self.num_envs, num_cubes, 2]) #shape (num_envs, num_cubes, 2)
+        cube_pose_x = cube_pose_x + origins_x #shape (num_envs, num_cubes, 2)
         cube_pose_y = cube_pose_y.expand([self.num_envs, num_cubes, 2]) #shape (num_envs, num_cubes, 2)
+        cube_pose_y = cube_pose_y + origins_y #shape (num_envs, num_cubes, 2)
         # print("[INFO]: cube_pose_x: ", cube_pose_x)      
         # print("[INFO]: cube_pose_y: ", cube_pose_y)      
         
@@ -189,159 +194,44 @@ class CubeTerrainLoopEnv(DirectRLEnv):
         return torch.any(in_cube, dim=1, keepdim=True) #shape (num_envs, 1)
     
     def _calculate_terrain_rewards(self) -> torch.Tensor:
-        OFFSET = 152.0
-        yellow_cube_pos_x = torch.tensor([
-            [-147.5, -144.5], # left, 1
-            [-147.5, -144.5], # left, 2
-            [-147.5, -144.5], # left, 3
-            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 1
-            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 2
-            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 3
-            [-142.0, -106.0], # bottom, 1
-            [-82.0, -58.5], # bottom, 2
-            [-34.0, -2.0], # bottom, 3
-            [-142.0, -106.0], # top, 1
-            [-82.0, -58.5], # top, 2
-            [-34.0, -2.0], # top, 3
-        ], dtype=torch.float, device=self.device)               #shape (12, 2)
-
-        yellow_cube_pos_y = torch.tensor([
-            [-128.0, -92.0], #left 1
-            [-67.5, -44.0], #left 2
-            [-20.0, 16.0], #left 3
-            [-128.0, -92.0], #right 1
-            [-67.5, -44.0], #right 2
-            [-20.0, 16.0], #right 3
-            [-133.5, -130.5], #bottom 1
-            [-133.5, -130.5], #bottom 2
-            [-133.5, -130.5], #bottom 3
-            [-133.5 + OFFSET, -130.5 + OFFSET], #top 1
-            [-133.5 + OFFSET, -130.5 + OFFSET], #top 2
-            [-133.5 + OFFSET, -130.5 + OFFSET], #top 3
-        ], dtype=torch.float, device=self.device)               #shape (12, 2)
-
-        blue_cube_pos_x = torch.tensor([
-            [-155.5, -152.5], #left long 1
-            [-151.5, -146.5], #left short 1
-            [-151.5, -146.5], #left short 2
-            [-139.5, -136.5], #left long 2
-            [-145.5, -140.5], #left short 3
-            [-145.5, -140.5], #left short 4
-            [-155.5 + OFFSET, -152.5 + OFFSET], #right long 1
-            [-152.5 + OFFSET, -146.5 + OFFSET], #right short 1
-            [-152.5 + OFFSET, -146.5 + OFFSET], #right short 2
-            [-139.5 + OFFSET, -136.5 + OFFSET], #right long 2
-            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 3
-            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 4
-            [-105.5, -82.5], #bottom long 1
-            [-105.5, -102.5], #bottom short 1
-            [-85.5, -82.5], #bottom short 2
-            [-57.5, -34.5], #bottom long 2
-            [-57.5, -54.5], #bottom short 3
-            [-37.5, -34.5], #bottom short 4
-            [-105.5, -82.5], #top long 1
-            [-105.5, -102.5], #top short 1
-            [-85.5, -82.5], #top short 2
-            [-57.5, -34.5], #top long 2
-            [-57.5, -54.5], #top short 3
-            [-37.5, -34.5], #top short 4
-        ], dtype=torch.float, device=self.device)               #shape (24, 2)
-
-        blue_cube_pos_y = torch.tensor([
-            [-91.5, -68.5], #left long 1
-            [-91.5, -88.5], #left short 1
-            [-71.5, -68.5], #left short 2
-            [-43.5, -20.5], #left long 2
-            [-43.5, -40.5], #left short 3
-            [-23.5, -20.5], #left short 4
-            [-91.5, -68.5], #right long 1
-            [-91.5, -88.5], #right short 1
-            [-71.5, -68.5], #right short 2
-            [-43.5, -20.5], #right long 2
-            [-43.5, -40.5], #right short 3
-            [-23.5, -20.5], #right short 4
-            [-125.5, -122.5], #bottom long 1
-            [-131.5, -126.5], #bottom short 1
-            [-131.5, -126.5], #bottom short 2
-            [-141.5, -138.5], #bottom long 2
-            [-137.5, -132.5], #bottom short 3
-            [-137.5, -132.5], #bottom short 4
-            [-125.5 + OFFSET, -122.5 + OFFSET], #top long 1
-            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 1
-            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 2
-            [-141.5 + OFFSET, -138.5 + OFFSET], #top long 2
-            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 3
-            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 4
-        ], dtype=torch.float, device=self.device)               #shape (24, 2)
-
-        red_cube_pos_x = torch.tensor([
-            [-139.5, -136.5], #left long 1
-            [-145.5, -140.5], #left short 1
-            [-145.5, -140.5], #left short 2
-            [-155.5, -152.5], #left long 2
-            [-151.5, -146.5], #left short 3
-            [-151.5, -146.5], #left short 4
-            [-139.5 + OFFSET, -136.5 + OFFSET], #right long 1
-            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 1
-            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 2
-            [-155.5 + OFFSET, -152.5 + OFFSET], #right long 2
-            [-151.5 + OFFSET, -146.5 + OFFSET], #right short 3
-            [-151.5 + OFFSET, -146.5 + OFFSET], #right short 4
-            [-105.5, -82.5], #bottom long 1
-            [-105.5, -102.5], #bottom short 1
-            [-85.5, -82.5], #bottom short 2
-            [-57.5, -34.5], #bottom long 2
-            [-57.5, -54.5], #bottom short 3
-            [-37.5, -34.5], #bottom short 4
-            [-105.5, -82.5], #top long 1
-            [-105.5, -102.5], #top short 1
-            [-85.5, -82.5], #top short 2
-            [-57.5, -34.5], #top long 2
-            [-57.5, -54.5], #top short 3
-            [-37.5, -34.5], #top short 4
-        ], dtype=torch.float, device=self.device)               #shape (24, 2)
-
-        red_cube_pos_y = torch.tensor([
-            [-91.5, -68.5], #left long 1
-            [-91.5, -88.5], #left short 1
-            [-71.5, -68.5], #left short 2
-            [-43.5, -20.5], #left long 2
-            [-23.5, -20.5], #left short 3
-            [-43.5, -40.5], #left short 4
-            [-91.5, -68.5], #right long 1
-            [-91.5, -88.5], #right short 1
-            [-71.5, -68.5], #right short 2
-            [-43.5, -20.5], #right long 2
-            [-23.5, -20.5], #right short 3
-            [-43.5, -40.5], #right short 4
-            [-141.5, -138.5], #bottom long 1
-            [-137.5, -132.5], #bottom short 1
-            [-137.5, -132.5], #bottom short 2
-            [-125.5, -122.5], #bottom long 2
-            [-131.5, -126.5], #bottom short 3
-            [-131.5, -126.5], #bottom short 4
-            [-141.5 + OFFSET, -138.5 + OFFSET], #top long 1
-            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 1
-            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 2
-            [-125.5 + OFFSET, -122.5 + OFFSET], #top long 2
-            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 3
-            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 4
-        ], dtype=torch.float, device=self.device)               #shape (24, 2)
-
-        # self.scene.env_origins
+        
+        yellow_cube_pos_x = torch.tensor(self.cfg.yellow_cube_pos_x, dtype=torch.float, device=self.device)               #shape (12, 2)
+        yellow_cube_pos_y = torch.tensor(self.cfg.yellow_cube_pos_y, dtype=torch.float, device=self.device)               #shape (12, 2)
+        blue_cube_pos_x = torch.tensor(self.cfg.blue_cube_pos_x, dtype=torch.float, device=self.device)               #shape (24, 2)
+        blue_cube_pos_y = torch.tensor(self.cfg.blue_cube_pos_y, dtype=torch.float, device=self.device)               #shape (24, 2)
+        red_cube_pos_x = torch.tensor(self.cfg.red_cube_pos_x, dtype=torch.float, device=self.device)               #shape (24, 2)
+        red_cube_pos_y = torch.tensor(self.cfg.red_cube_pos_y, dtype=torch.float, device=self.device)               #shape (24, 2)
 
         in_yellow_cube = self._check_current_cube(yellow_cube_pos_x, yellow_cube_pos_y) #shape (num_envs, 1)
         in_blue_cube = self._check_current_cube(blue_cube_pos_x, blue_cube_pos_y) #shape (num_envs, 1)
         in_red_cube = self._check_current_cube(red_cube_pos_x, red_cube_pos_y) #shape (num_envs, 1)
-        in_green_cube = torch.logical_not(torch.logical_and(in_red_cube, torch.logical_and(in_yellow_cube, in_blue_cube))) #shape (num_envs, 1)
+        in_green_cube = torch.logical_not(torch.logical_or(in_red_cube, torch.logical_or(in_yellow_cube, in_blue_cube))) #shape (num_envs, 1)
 
+        # print(f"[INFO]: in_yellow_cube: {in_yellow_cube}")
         # print(f"[INFO]: in_blue_cube: {in_blue_cube}")
-
+        # print(f"[INFO]: in_red_cube: {in_red_cube}")
+        # print(f"[INFO]: in_green_cube: {in_green_cube}")
         
         in_cube = torch.cat((in_yellow_cube, in_blue_cube, in_red_cube, in_green_cube), dim=1) #shape (num_envs, 4)
         terrain_rewards = in_cube * torch.tensor(self.cfg.terrain_rewards, dtype=torch.float, device=self.device) #shape (num_envs, 4)
 
         return torch.sum(terrain_rewards, 1) # (num_envs)
+    
+    def _check_termination_terrain(self) -> torch.Tensor:
+        
+        yellow_cube_pos_x = torch.tensor(self.cfg.yellow_cube_pos_x, dtype=torch.float, device=self.device)               #shape (12, 2)
+        yellow_cube_pos_y = torch.tensor(self.cfg.yellow_cube_pos_y, dtype=torch.float, device=self.device)               #shape (12, 2)
+        blue_cube_pos_x = torch.tensor(self.cfg.blue_cube_pos_x, dtype=torch.float, device=self.device)               #shape (24, 2)
+        blue_cube_pos_y = torch.tensor(self.cfg.blue_cube_pos_y, dtype=torch.float, device=self.device)               #shape (24, 2)
+        red_cube_pos_x = torch.tensor(self.cfg.red_cube_pos_x, dtype=torch.float, device=self.device)               #shape (24, 2)
+        red_cube_pos_y = torch.tensor(self.cfg.red_cube_pos_y, dtype=torch.float, device=self.device)               #shape (24, 2)
+
+        in_yellow_cube = self._check_current_cube(yellow_cube_pos_x, yellow_cube_pos_y) #shape (num_envs, 1)
+        in_blue_cube = self._check_current_cube(blue_cube_pos_x, blue_cube_pos_y) #shape (num_envs, 1)
+        in_red_cube = self._check_current_cube(red_cube_pos_x, red_cube_pos_y) #shape (num_envs, 1)
+        in_green_cube = torch.logical_not(torch.logical_or(in_red_cube, torch.logical_or(in_yellow_cube, in_blue_cube))) #shape (num_envs, 1)
+
+        return torch.squeeze(in_green_cube) #shape (num_envs)
 
     def _get_rewards(self) -> torch.Tensor:
         
@@ -351,12 +241,12 @@ class CubeTerrainLoopEnv(DirectRLEnv):
         # force_matrices_C = self.scene["contact_sensor_C"].data.force_matrix_w.clone()
         # force_matrices = torch.cat((force_matrices_L, force_matrices_R, force_matrices_C), dim=-1)
         # flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
-        flat_force_matrices = torch.zeros((self.num_envs, 3), dtype=torch.float, device=self.device)
+        # flat_force_matrices = torch.zeros((self.num_envs, 3), dtype=torch.float, device=self.device)
         # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
 
-        died = torch.any(flat_force_matrices != 0.0, dim=1)
-        clash_error=torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
-        clash_error[died] = 1.0
+        # died = torch.any(flat_force_matrices != 0.0, dim=1)
+        # clash_error=torch.zeros(self.num_envs, dtype=torch.float, device=self.device)
+        # clash_error[died] = 1.0
         # if died:
         #     #in_contact
         #     clash_error = torch.tensor(1.0, dtype=torch.float, device=self.device)
@@ -368,7 +258,6 @@ class CubeTerrainLoopEnv(DirectRLEnv):
 
         rewards = {
             "terrain_reward": terrain_reward,
-            "clash_reward": clash_error * self.cfg.clash_reward_scale,
         }
         reward = torch.sum(torch.stack(list(rewards.values())), dim=0)
         # print(f"[INFO]: clash_error: {clash_error}")
@@ -392,7 +281,7 @@ class CubeTerrainLoopEnv(DirectRLEnv):
         # last_contact_time = torch.cat((self.scene["contact_sensor_L"].data.last_contact_time, self.scene["contact_sensor_R"].data.last_contact_time), dim=-1)
         # current_contact_time = torch.cat((self.scene["contact_sensor_L"].data.current_contact_time, self.scene["contact_sensor_R"].data.current_contact_time), dim=-1)
         # flat_force_matrices = torch.flatten(force_matrices, start_dim=1)
-        flat_force_matrices = torch.zeros((self.num_envs, 3), dtype=torch.float, device=self.device)
+        # flat_force_matrices = torch.zeros((self.num_envs, 3), dtype=torch.float, device=self.device)
 
         # print(f"[INFO]: flat_force_matrices: {flat_force_matrices}")
         # print(f"[INFO]: net_forces : {net_forces}")
@@ -401,7 +290,8 @@ class CubeTerrainLoopEnv(DirectRLEnv):
         # print(f"[INFO]: current_contact_time : {current_contact_time}")
         # max_force = torch.max(flat_force_matrices, dim=1, keepdim=True)[0]
         # print(f"[INFO]: force_matrices_L: {force_matrices_L.shape} force_matrices_R:{force_matrices_R.shape} force_matrices:{force_matrices.shape} flat_force_matrices:{flat_force_matrices.shape} max_force: {max_force.shape}")
-        died = torch.any(flat_force_matrices != 0.0, dim=1)
+        died = self._check_termination_terrain() #shape (num_envs)
+        # died = torch.any(flat_force_matrices != 0.0, dim=1)
         # if died or time_out:
         #     print(f"[INFO]: self.episode_length_buf : {self.episode_length_buf}  self.max_episode_length :{ self.max_episode_length }")
         #     print(f"[INFO]: _get_dones died: {died} time_out:{time_out}")

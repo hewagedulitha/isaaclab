@@ -96,7 +96,7 @@ class CubeTerrainLoopEnvSceneCfg(InteractiveSceneCfg):
             activate_contact_sensors=True,
         ),
         init_state=ArticulationCfg.InitialStateCfg(
-                        pos=(-140.0, -132.0, 0.4), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+                        pos=(-115.0, -132.0, 0.4), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
             # pos=(-24.0, 24.0, 0.4), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
         ),
         actuators={
@@ -142,7 +142,7 @@ class CubeTerrainLoopEnvCfg(DirectRLEnvCfg):
     scene: CubeTerrainLoopEnvSceneCfg = CubeTerrainLoopEnvSceneCfg(num_envs=1, env_spacing=192.0, replicate_physics=False)
 
     # change viewer settings
-    viewer = ViewerCfg(cam_prim_path="/World/envs/env_0/carter_v1/chassis_link/front_cam", resolution=(640, 480))
+    viewer = ViewerCfg(eye=(20.0, 20.0, 20.0), lookat=(-108.0, -132.0, 0.0))
 
     # events
     # events: EventCfg = EventCfg()
@@ -154,7 +154,7 @@ class CubeTerrainLoopEnvCfg(DirectRLEnvCfg):
     # )
 
     # env
-    episode_length_s = 80.0
+    episode_length_s = 400.0
 
     #DQN
     # decimation = 8
@@ -201,6 +201,141 @@ class CubeTerrainLoopEnvCfg(DirectRLEnvCfg):
             restitution=0.0,
         ),
     )
+
+    #terrain cube coords
+    OFFSET = 152.0
+    yellow_cube_pos_x = [
+            [-147.5, -144.5], # left, 1
+            [-147.5, -144.5], # left, 2
+            [-147.5, -144.5], # left, 3
+            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 1
+            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 2
+            [-147.5 + OFFSET, -144.5 + OFFSET], # right, 3
+            [-142.0, -106.0], # bottom, 1
+            [-82.0, -58.5], # bottom, 2
+            [-34.0, -2.0], # bottom, 3
+            [-142.0, -106.0], # top, 1
+            [-82.0, -58.5], # top, 2
+            [-34.0, -2.0], # top, 3
+        ]
+    yellow_cube_pos_y = [
+            [-128.0, -92.0], #left 1
+            [-67.5, -44.0], #left 2
+            [-20.0, 16.0], #left 3
+            [-128.0, -92.0], #right 1
+            [-67.5, -44.0], #right 2
+            [-20.0, 16.0], #right 3
+            [-133.5, -130.5], #bottom 1
+            [-133.5, -130.5], #bottom 2
+            [-133.5, -130.5], #bottom 3
+            [-133.5 + OFFSET, -130.5 + OFFSET], #top 1
+            [-133.5 + OFFSET, -130.5 + OFFSET], #top 2
+            [-133.5 + OFFSET, -130.5 + OFFSET], #top 3
+        ]
+    blue_cube_pos_x = [
+            [-155.5, -152.5], #left long 1
+            [-151.5, -146.5], #left short 1
+            [-151.5, -146.5], #left short 2
+            [-139.5, -136.5], #left long 2
+            [-145.5, -140.5], #left short 3
+            [-145.5, -140.5], #left short 4
+            [-155.5 + OFFSET, -152.5 + OFFSET], #right long 1
+            [-152.5 + OFFSET, -146.5 + OFFSET], #right short 1
+            [-152.5 + OFFSET, -146.5 + OFFSET], #right short 2
+            [-139.5 + OFFSET, -136.5 + OFFSET], #right long 2
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 3
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 4
+            [-105.5, -82.5], #bottom long 1
+            [-105.5, -102.5], #bottom short 1
+            [-85.5, -82.5], #bottom short 2
+            [-57.5, -34.5], #bottom long 2
+            [-57.5, -54.5], #bottom short 3
+            [-37.5, -34.5], #bottom short 4
+            [-105.5, -82.5], #top long 1
+            [-105.5, -102.5], #top short 1
+            [-85.5, -82.5], #top short 2
+            [-57.5, -34.5], #top long 2
+            [-57.5, -54.5], #top short 3
+            [-37.5, -34.5], #top short 4
+        ]
+    blue_cube_pos_y = [
+            [-91.5, -68.5], #left long 1
+            [-91.5, -88.5], #left short 1
+            [-71.5, -68.5], #left short 2
+            [-43.5, -20.5], #left long 2
+            [-43.5, -40.5], #left short 3
+            [-23.5, -20.5], #left short 4
+            [-91.5, -68.5], #right long 1
+            [-91.5, -88.5], #right short 1
+            [-71.5, -68.5], #right short 2
+            [-43.5, -20.5], #right long 2
+            [-43.5, -40.5], #right short 3
+            [-23.5, -20.5], #right short 4
+            [-125.5, -122.5], #bottom long 1
+            [-131.5, -126.5], #bottom short 1
+            [-131.5, -126.5], #bottom short 2
+            [-141.5, -138.5], #bottom long 2
+            [-137.5, -132.5], #bottom short 3
+            [-137.5, -132.5], #bottom short 4
+            [-125.5 + OFFSET, -122.5 + OFFSET], #top long 1
+            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 1
+            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 2
+            [-141.5 + OFFSET, -138.5 + OFFSET], #top long 2
+            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 3
+            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 4
+        ]
+    red_cube_pos_x = [
+            [-139.5, -136.5], #left long 1
+            [-145.5, -140.5], #left short 1
+            [-145.5, -140.5], #left short 2
+            [-155.5, -152.5], #left long 2
+            [-151.5, -146.5], #left short 3
+            [-151.5, -146.5], #left short 4
+            [-139.5 + OFFSET, -136.5 + OFFSET], #right long 1
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 1
+            [-145.5 + OFFSET, -140.5 + OFFSET], #right short 2
+            [-155.5 + OFFSET, -152.5 + OFFSET], #right long 2
+            [-151.5 + OFFSET, -146.5 + OFFSET], #right short 3
+            [-151.5 + OFFSET, -146.5 + OFFSET], #right short 4
+            [-105.5, -82.5], #bottom long 1
+            [-105.5, -102.5], #bottom short 1
+            [-85.5, -82.5], #bottom short 2
+            [-57.5, -34.5], #bottom long 2
+            [-57.5, -54.5], #bottom short 3
+            [-37.5, -34.5], #bottom short 4
+            [-105.5, -82.5], #top long 1
+            [-105.5, -102.5], #top short 1
+            [-85.5, -82.5], #top short 2
+            [-57.5, -34.5], #top long 2
+            [-57.5, -54.5], #top short 3
+            [-37.5, -34.5], #top short 4
+        ]
+    red_cube_pos_y = [
+            [-91.5, -68.5], #left long 1
+            [-91.5, -88.5], #left short 1
+            [-71.5, -68.5], #left short 2
+            [-43.5, -20.5], #left long 2
+            [-23.5, -20.5], #left short 3
+            [-43.5, -40.5], #left short 4
+            [-91.5, -68.5], #right long 1
+            [-91.5, -88.5], #right short 1
+            [-71.5, -68.5], #right short 2
+            [-43.5, -20.5], #right long 2
+            [-23.5, -20.5], #right short 3
+            [-43.5, -40.5], #right short 4
+            [-141.5, -138.5], #bottom long 1
+            [-137.5, -132.5], #bottom short 1
+            [-137.5, -132.5], #bottom short 2
+            [-125.5, -122.5], #bottom long 2
+            [-131.5, -126.5], #bottom short 3
+            [-131.5, -126.5], #bottom short 4
+            [-141.5 + OFFSET, -138.5 + OFFSET], #top long 1
+            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 1
+            [-137.5 + OFFSET, -132.5 + OFFSET], #top short 2
+            [-125.5 + OFFSET, -122.5 + OFFSET], #top long 2
+            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 3
+            [-131.5 + OFFSET, -126.5 + OFFSET], #top short 4
+        ]
 
     # reward scales
     goal_reward_scale = 2000.0
