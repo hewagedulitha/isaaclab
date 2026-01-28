@@ -69,7 +69,7 @@ class CubeTerrainLoopEnvSceneCfg(InteractiveSceneCfg):
     ground = AssetBaseCfg(
                             prim_path="{ENV_REGEX_NS}/outback", 
                             spawn=sim_utils.UsdFileCfg(
-                                usd_path="/home/hewaged/Documents/cube_terrain_loop_nav_2.usd",
+                                usd_path="/home/hewaged/Documents/cube_terrain_loop_nav_3.usd",
                             )
             )
 
@@ -97,7 +97,7 @@ class CubeTerrainLoopEnvSceneCfg(InteractiveSceneCfg):
         ),
         init_state=ArticulationCfg.InitialStateCfg(
                         # pos=(10.0, -3.0, 0.4), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
-                        pos=(4.0, 6.0, 0.4), rot=(0.70711, 0.0, 0.0, 0.70711),  joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
+                        pos=(2.0, 2.0, 0.4), rot=(0.70711, 0.0, 0.0, 0.70711),  joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
             # pos=(-24.0, 24.0, 0.4), rot=(0.70711, 0.0, 0.0, -0.70711), joint_pos={"left_wheel": 0.0, "right_wheel": 0.0},
         ),
         actuators={
@@ -115,8 +115,8 @@ class CubeTerrainLoopEnvSceneCfg(InteractiveSceneCfg):
     camera = TiledCameraCfg(
         prim_path="{ENV_REGEX_NS}/carter_v1/chassis_link/front_cam",
         # update_period=0.1,
-        height=120,
-        width=160,
+        height=100,
+        width=100,
         data_types=["distance_to_image_plane", "semantic_segmentation"],
         colorize_semantic_segmentation=True,
         semantic_segmentation_mapping={
@@ -140,7 +140,7 @@ class CubeTerrainLoopEnvSceneCfg(InteractiveSceneCfg):
 @configclass
 class CubeTerrainLoopEnvCfg(DirectRLEnvCfg):
     # scene
-    scene: CubeTerrainLoopEnvSceneCfg = CubeTerrainLoopEnvSceneCfg(num_envs=1, env_spacing=44.0, replicate_physics=False)
+    scene: CubeTerrainLoopEnvSceneCfg = CubeTerrainLoopEnvSceneCfg(num_envs=1, env_spacing=22.0, replicate_physics=False)
 
     # change viewer settings
     viewer = ViewerCfg(eye=(20.0, 20.0, 20.0), lookat=scene.robot.init_state.pos)
@@ -166,7 +166,7 @@ class CubeTerrainLoopEnvCfg(DirectRLEnvCfg):
     action_scale = 2.0
     #use normalized action spaces for PPO. Not required if using SAC in which case, action_space = 1 is used
     # action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
-    action_space = gym.spaces.Box(low=float(-1.0), high=float(1.0), shape=(1,), dtype=np.float32)
+    action_space = gym.spaces.Box(low=float(-0.5), high=float(0.5), shape=(1,), dtype=np.float32)
     
     # MultiDict action spaces are not supported by SAC (https://stable-baselines3.readthedocs.io/en/master/modules/sac.html)
     # action_space = gym.spaces.Dict({
@@ -204,86 +204,62 @@ class CubeTerrainLoopEnvCfg(DirectRLEnvCfg):
     )
 
     #terrain cube coords
-    OFFSET = 18.0
+    OFFSET = 12.0
     yellow_cube_pos_x = [
-            [3.0, 5.0], # left, 1
-            [3.0, 5.0], # left, 2
-            [3.0, 9.0], # bottom, 1
-            [17.0, 23.0], # bottom, 2
-            [3.0 + OFFSET, 5.0 + OFFSET], # right, 1
-            [3.0 + OFFSET, 5.0 + OFFSET], # right, 2
-            [3.0, 9.0], # top, 1
-            [17.0, 23.0], # top, 2
+            [0.0, 4.0], # left, 1
+            [0.0, 4.0], # left, 2
+            [0.0 + OFFSET, 4.0 + OFFSET], # right, 1
+            [0.0 + OFFSET, 4.0 + OFFSET], # right, 2
         ]
     yellow_cube_pos_y = [
-            [3.0, 9.0], #left 1
-            [17.0, 23.0], #left 2
-            [3.0, 5.0], #bottom 1
-            [3.0, 5.0], #bottom 2
-            [3.0, 9.0], #right 1
-            [17.0, 23.0], #right 2
-            [3.0 + OFFSET, 5.0 + OFFSET], #top 1
-            [3.0 + OFFSET, 5.0 + OFFSET], #top 2
+            [0.0, 4.0], #left 1
+            [12.0, 16.0], #left 2
+            [0.0, 4.0], #right 1
+            [12.0 , 16.0], #right 2
         ]
     blue_cube_pos_x = [
-            [6.0, 8.0], #left long 1
-            [4.0, 6.0], #left short 1
-            [4.0, 6.0], #left short 2
-            [9.0, 17.0], #bottom long 1
-            [9.0, 11.0], #bottom short 1
-            [15.0, 17.0], #bottom short 2
-            [6.0 + OFFSET, 8.0 + OFFSET], #right long 1
-            [4.0 + OFFSET, 6.0 + OFFSET], #right short 1
-            [4.0 + OFFSET, 6.0 + OFFSET], #right short 2
-            [9.0, 17.0], #top long 1
-            [9.0, 11.0], #top short 1
-            [15.0, 17.0], #top short 2
+            [2.0, 4.0], #left 1
+            [0.0, 2.0], #left 2
+            [4.0, 8.0], #bottom 1
+            [8.0, 12.0], #bottom 2
+            [2.0 + OFFSET, 4.0 + OFFSET], #right 1
+            [0.0 + OFFSET, 2.0 + OFFSET], #right 2
+            [4.0, 8.0], #top 1
+            [8.0, 12.0], #top 2
         ]
     blue_cube_pos_y = [
-            [9.0, 17.0], #left long 1
-            [9.0, 11.0], #left short 1
-            [15.0, 17.0], #left short 2
-            [0.0, 2.0], #bottom long 1
-            [2.0, 4.0], #bottom short 1
-            [2.0, 4.0], #bottom short 2
-            [9.0, 17.0], #right long 1
-            [9.0, 11.0], #right short 1
-            [15.0, 17.0], #right short 2
-            [0.0 + OFFSET, 2.0 + OFFSET], #top long 1
-            [2.0 + OFFSET, 4.0 + OFFSET], #top short 1
-            [2.0 + OFFSET, 4.0 + OFFSET], #top short 2
+            [4.0, 8.0], #left 1
+            [8.0, 12.0], #left 2
+            [0.0, 2.0], #bottom 1
+            [2.0, 4.0], #bottom 2
+            [4.0, 8.0], #right 1
+            [8.0, 12.0], #right 2
+            [0.0 + OFFSET, 2.0 + OFFSET], #top 1
+            [2.0 + OFFSET, 4.0 + OFFSET], #top 2
         ]
     red_cube_pos_x = [
-            [0.0, 2.0], #left long 1
-            [2.0, 4.0], #left short 1
-            [2.0, 4.0], #left short 2
-            [9.0, 17.0], #bottom long 1
-            [9.0, 11.0], #bottom short 1
-            [15.0, 17.0], #bottom short 2
-            [0.0 + OFFSET, 2.0 + OFFSET], #right long 1
-            [2.0 + OFFSET, 4.0 + OFFSET], #right short 1
-            [2.0 + OFFSET, 4.0 + OFFSET], #right short 2
-            [9.0, 17.0], #top long 1
-            [9.0, 11.0], #top short 1
-            [15.0, 17.0], #top short 2
+            [0.0, 2.0], #left 1
+            [2.0, 4.0], #left 2
+            [4.0, 8.0], #bottom 1
+            [8.0, 12.0], #bottom 2
+            [0.0 + OFFSET, 2.0 + OFFSET], #right 1
+            [2.0 + OFFSET, 4.0 + OFFSET], #right 2
+            [4.0, 8.0], #top 1
+            [8.0, 12.0], #top 2
         ]
     red_cube_pos_y = [
-            [9.0, 17.0], #left long 1
-            [9.0, 11.0], #left short 1
-            [15.0, 17.0], #left short 2
-            [6.0, 8.0], #bottom long 1
-            [4.0, 6.0], #bottom short 1
-            [4.0, 6.0], #bottom short 2
-            [9.0, 17.0], #right long 1
-            [9.0, 11.0], #right short 1
-            [15.0, 17.0], #right short 2
-            [6.0 + OFFSET, 8.0 + OFFSET], #top long 1
-            [4.0 + OFFSET, 6.0 + OFFSET], #top short 1
-            [4.0 + OFFSET, 6.0 + OFFSET], #top short 2
+            [4.0, 8.0], #left 1
+            [8.0, 12.0], #left 2
+            [2.0, 4.0], #bottom 1
+            [0.0, 2.0], #bottom 2
+            [4.0, 8.0], #right 1
+            [8.0, 12.0], #right 2
+            [2.0 + OFFSET, 4.0 + OFFSET], #top 1
+            [0.0 + OFFSET, 2.0 + OFFSET], #top 2
         ]
 
     # reward scales
     goal_reward_scale = 2000.0
     clash_reward_scale = -1000.0
     goal_distance_reward_scale = 1.0
-    terrain_rewards = [0.2, 0.5, 0.1, -100.0] # yellow, blue, red, green
+    terrain_rewards = [0.0, 0.5, 0.1, -100.0] # yellow, blue, red, green

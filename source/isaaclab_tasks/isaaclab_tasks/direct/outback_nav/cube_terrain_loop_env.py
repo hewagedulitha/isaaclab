@@ -92,8 +92,8 @@ class CubeTerrainLoopEnv(DirectRLEnv):
         self._actions = actions.clone()
         # print(f"[INFO]:self._actions Shape: {self._actions.shape} self._actions: {self._actions}")
         # target = torch.zeros((self.num_envs, 1), dtype=torch.float32, device=self.device)
-        # target = torch.where(self._actions == 1.0, -0.5, target)
-        # target = torch.where(self._actions == 2.0, 0.5, target)
+        # target = torch.where(self._actions == 1.0, -1.0, target)
+        # target = torch.where(self._actions == 2.0, 1.0, target)
         # self._processed_actions = target
         self._processed_actions = self._actions
         linear_speed = 0.8
@@ -235,6 +235,7 @@ class CubeTerrainLoopEnv(DirectRLEnv):
 
     def _get_rewards(self) -> torch.Tensor:
         
+        # default_root_state
         #clash error
         # force_matrices_L = self.scene["contact_sensor_L"].data.force_matrix_w.clone()
         # force_matrices_R = self.scene["contact_sensor_R"].data.force_matrix_w.clone()
